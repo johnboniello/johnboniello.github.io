@@ -114,10 +114,46 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   <p class="w3-large w3-center">Welcome to my site. On this site you will find my semi-regular research roundup, occasional blog posts, and my beta or fully active development projects. My goal is to make the hard stuff easier for teachers, this means summarizing research and writing programs that might be helpful, especially to teachers of students with disabilities and ELLs.</p>
   <!--<button class="w3-button w3-black w3-padding-large w3-large w3-margin-top">Get Started</button>-->
 </header>
-<div class="row">
-  <div class="column left";>
+  
+  <style>
+* {
+    box-sizing: border-box;
+}
+
+/* Create two unequal columns that floats next to each other */
+.column2 {
+    float: left;
+    padding: 0px;
+    
+}
+
+.left2 {
+  width: 20%; height: 100%;
+}
+
+.right2 {
+  width: 80%;
+}
+
+/* Clear floats after the columns */
+.row2:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+ 
+@media (max-width: 600px) {
+   .column2 {
+        width: 100%;
+    }
+}
+ 
+ 
+</style> 
+<div class="row2">
+  <div class="column2 left2";>
 <!-- First Grid --> 
-<div class="w3-row-padding w3-WhiteSmoke w3-padding-100 w3-container">
+<div class="w3-row-padding w3-WhiteSmoke w3-padding-50 w3-container">
   <div class="w3-content">
    <img src="johnboniello.github.io/images/exttimeicon.png" alt="" class="inline"width="350" height="350" w3-padding-64/>
     <div class="w3-third w3-center"> 
@@ -126,7 +162,7 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
   </div>
     </div>
   </div>
-<div class="column right";>
+<div class="column2 right2";>
     <div class="w3-twothird">
       <h1><a href="http://johnboniello.github.io/Extended-Time-Calculator">Extended Time Calculator</h1>
       <h5 class="w3-padding-32">A tool for special education teachers.</h5></a>
