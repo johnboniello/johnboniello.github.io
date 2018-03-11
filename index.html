@@ -1,253 +1,44 @@
-<!DOCTYPE html>
-<html>
-  <head>
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-115065150-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+---
+layout: splash
+permalink: /
+header:
+  overlay_color: "#5e616c"
+  overlay_image:  /assets/images/28179983663_eee95df36e_o.jpg
+  caption:
+excerpt: 'Welcome to my site. On this site you will find my semi-regular research roundup, 
+          occasional blog posts, and my beta or fully active development projects. My goal is to make the hard stuff easier for 
+          teachers, this means summarizing research and writing programs that might be helpful, especially to teachers of students 
+          with disabilities and ELLs.'
 
-  gtag('config', 'UA-115065150-1');
-</script>
+feature_row:
+  - image_path:  /assets/images/exttimeicon.png
+    alt: "extended time calculator"
+    title: "Extended Time Calculator"
+    excerpt: "On this page you will find the Extended time calculator. This tool will help in making decisions about extended time accommodations for SWD."
+    url: "/exttimezip"
+    btn_class: "btn--primary"
+    btn_label: "Learn More"
+  - image_path: /assets/images/pexels-photo-267582.jpeg
+    alt: "Research Roundup"
+    title: "Research Roundup"
+    excerpt: "On this page I will post my semi-regular research and education roundup. 
+              This research and education roundup is a summary of my reading in education that you might find helpful. 
+              I’ve called these “research roundups” but the sources will not always be peer reviewed."
+    url: "/"
+    btn_class: "btn--primary"
+    btn_label: "Read!"
+  - image_path: /assets/images/28179982883_21e7111f74_m.jpg
+    alt: "Blogs"
+    title: "Blogs"
+    excerpt: "Here you will find my blogs. They may not be updated frequently."
+    url: "/"
+    btn_class: "btn--primary"
+    btn_label: "Read!"
 
-  
-<title>John's Home Page</title>
+intro:
+  - excerpt: 'Get notified when I add new stuff &nbsp; [<i class="fab fa-twitter"></i> @johnboniello](https://twitter.com/johnboniello){: .btn .btn--twitter}'
+---
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-<link rel="stylesheet" href="https://cdn.rawgit.com/jpswalsh/academicons/master/css/academicons.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<style>
-body,h1,h2,h3,h4,h5,h6 {font-family: "Lato", sans-serif}
-.w3-bar,h1,button {font-family: "Montserrat", sans-serif}
-.fa-calculator {font-size:200px}
-  {% seo %}
-</head>
- <style>
-* {
-    box-sizing: border-box;
-}
+{% include feature_row id="intro" type="center" %}
 
-/* Create two unequal columns that floats next to each other */
-.column {
-    float: left;
-    padding: 10px;
-    
-}
-
-.left {
-  width: 20%; height: 100%;
-}
-
-.right {
-  width: 80%;
-}
-
-/* Clear floats after the columns */
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
- 
-@media (max-width: 600px) {
-   .column {
-        width: 100%;
-    }
-}
- 
- 
-</style>
-<body>
-
-<div class="row">
-  <div class="column left";>
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.12';
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-  
-<script
-    type="text/javascript"
-    async defer
-    src="//assets.pinterest.com/js/pinit.js"></script>
-
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-
-<!-- Navbar -->
-<div class="w3-right">
-  <div class="w3-bar w3-light-grey w3-card w3-left-align w3-large">
-    <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-black" href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-    <a href="https://johnboniello.github.io" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-white " style="width:100%; text-align: left">Home</a>
-    <a href="http://johnboniello.github.io/Extended-Time-Calculator" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-gray" style="width:100%; text-align: left">Extended Time Calculator</a>
-   <a href="http://johnboniello.com/Research-round-up/" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-gray" style="width:100%; text-align: left">Research Round-up</a>
-    <a href="http://johnboniello.github.io/blog2" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-gray" style="width:100%; text-align: left">Blogs</a>
-    <!--<a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Link 3</a>
-    <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Link 4</a> -->
-  </div>
-
-<!-- Navbar on small screens-->
-  <div id="navDemo" class="w3-bar-block w3-light-gray w3-hide w3-hide-large w3-hide-medium w3-large">
-    <a href="https://johnboniello.github.io" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
-    <a href="http://johnboniello.github.io/Extended-Time-Calculator" class="w3-bar-item w3-button w3-padding-large ">Extended Time Calculator</a>
-    <a href="http://johnboniello.com/Research-round-up/" class="w3-bar-item w3-button w3-padding-large">Research Roundup </a>
-    <a href="http://johnboniello.github.io/blog2" class="w3-bar-item w3-button w3-padding-large">Blogs</a>
-  </div>
-  </br>
-    </br>
-
-</div>
-                                                             
-</div>
-
-<body>
-<div class="column right">
-<!-- Header -->
-<header class="w3-container w3-blue-gray w3-center" style="padding:75px 16px">
-  <h1 class="w3-margin w3-jumbo">Welcome!</h1>
-  <p class="w3-large w3-center">Welcome to my site. On this site you will find my semi-regular research roundup, occasional blog posts, and my beta or fully active development projects. My goal is to make the hard stuff easier for teachers, this means summarizing research and writing programs that might be helpful, especially to teachers of students with disabilities and ELLs.</p>
-  <!--<button class="w3-button w3-black w3-padding-large w3-large w3-margin-top">Get Started</button>-->
-</header>
-  
-  <style>
-* {
-    box-sizing: border-box;
-}
-
-/* Create two unequal columns that floats next to each other */
-.column2 {
-    float: left;
-    padding: 0px;
-   
-    
-}
-
-.left2 {
-  width: 30%; height: 100%;  padding-right: 10px;
-}
-
-.right2 {
-  width: 70%;
-}
-
-/* Clear floats after the columns */
-.row2:after {
-    content: "";
-    display: table;
-    clear: both;
-}
- 
-@media (max-width: 600px) {
-   .column2 {
-        width: 100%;
-    }
-}
-img {
-    width: 100%;
-    height: auto;
-} 
- 
-</style> 
-<div class="row2">
-  <div class="column2 left2";>
-<!-- First Grid --> 
-
-   <img src="johnboniello.github.io/images/exttimeicon.png" alt="" class="inline" style="margin-top:10px" width="350" height="350" w3-padding-64/>
-    
-      
-   
-  </div>
-<div class="column2 right2";>
-    <div class="w3-twothird">
-      <h1><a href="http://johnboniello.github.io/Extended-Time-Calculator">Extended Time Calculator</h1>
-      <h5 class="w3-padding-32">A tool for special education teachers.</h5></a>
-
-      <p class="w3-text-DarkBlue">The extended time calculator is a tool to help special education teachers calculate the time a student with a disability actually needs when taking a test.  &nbsp Far too often teachers and others simply guess at the amount of time a student might need for testing accommodations. &nbsp This guessing is not accurate and we are not providing students with the actual time that they need on tests.  &nbsp With this tool teachers can keep track of the time a student takes on a test vs the time that was expeted of all students and calculate the accommodation. &nbsp This tool must be used in conjunction with other data and information to make this decision. </p>
-    </div>
-  </div>
-</div> 
-</div>
-
-<!-- Second Grid 
-<div class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
-  <div class="w3-content">
-    <div class="w3-third w3-center">
-      <i class="fa fa-coffee w3-padding-64 w3-text-red w3-margin-right"></i>
-    </div>
-
-    <div class="w3-twothird">
-      <h1>Lorem Ipsum</h1>
-      <h5 class="w3-padding-32">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h5>
-
-      <p class="w3-text-grey">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
-    </div>
-  </div>
-</div> -->
-
-<!--<div class="w3-container w3-black w3-center w3-opacity w3-padding-64">
-    <h1 class="w3-margin w3-xlarge">Quote of the day: live life</h1>
-</div>-->
-                                   </div>
- <!--Footer--> 
-<footer class="w3-container w3-padding-32 w3-center w3-opacity">  
-  <div class="w3-large w3-padding-16">
-    <p>Follow me on:</p>
-    <a href= "http://github.com/johnboniello"><i class="fa fa-github w3-hover-opacity fa-2x"></i></a>  
-    <a href= "https://www.youtube.com/channel/UC6Kb0adIgZcz6Fy1YMfzAXA"><i class="fa fa-youtube w3-hover-opacity fa-2x"></i></a> 
-    <a href="https://twitter.com/johnboniello"><i class="fa fa-twitter w3-hover-opacity fa-2x"></i></a>
-    <a href = "http://www.linkedin.com/in/john-boniello-280a2532"><i class="fa fa-linkedin w3-hover-opacity fa-2x"></i></a>
-    <a href="https://www.researchgate.net/profile/John_Boniello"><i class="ai ai-researchgate-square w3-hover-opacity ai-2x"></i></a>
-
-  </div>
-    
-  <div class="w3-large w3-padding-16">
-    <p>Share this on:</p>
-    <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" data-show-count="false"><i class="fa fa-twitter w3-hover-opacity fa-2x"></i></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>    
-    <a href="https://www.pinterest.com/pin/create/button/" data-pin-do = "buttonBookmark"><i class="fa fa-pinterest w3-hover-opacity fa-2x"></i></a>
-    <a href="//www.reddit.com/submit" onclick="window.location = '//www.reddit.com/submit?url=' + encodeURIComponent(window.location); return false"><i class="fa fa-reddit w3-hover-opacity fa-2x"></i> </a>
-     <div class="fb-like" data-width="30" data-layout="button" data-action="like" data-size="small" data-show-faces="true" data-share="true"></div>
-<p> &copy; John Boniello 2018</p>
-  </div>
- <div>                                                                                                                                        
-<p>Graphic is made up of four images found on 
-  <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> 
-  and licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></p>
-   
-   <p> They are</p>
-    <ul style="list-style-type:none">
-      <li> Clock made by <a href="http://www.freepik.com" title="Freepik">Freepik</a></li>
-      <li>Calculator made by <a href="https://www.flaticon.com/authors/prosymbols" title="Prosymbols">Prosymbols</a></li>
-      <li>Exam made by <a href="http://www.freepik.com" title="Freepik">Freepik</a></li>
-      <li>Graph made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a></li>
-   </ul>
-  </div>
-          
-
-
-</footer>
-
-<script>
-// Used to toggle the menu on small screens when clicking on the menu button
-function myFunction() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else { 
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
-</script>
-
-</body>
-</html>
+{% include feature_row %}
