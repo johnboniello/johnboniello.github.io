@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Welcome to Jekyll!
 #
 # This config file is meant for settings that affect your entire site, values
@@ -276,3 +277,7 @@ defaults:
       comments:  false
       share: true
       related: false
+=======
+plugins:
+  - jekyll-seo-tag
+>>>>>>> 5189d987a9211d1151d69c2be6172f0305c7de52
