@@ -1,12 +1,12 @@
 # main links
 main:
   - title: "Home"
-    url: https://jbonz37.github.io/
+    url: http://johnboniello.com/
   - title: "Extended Time Calculator"
-    url: https://jbonz37.github.io/exttimezip/
-   #- title: "Research Roundup"
-  #   url: /year-archive/
-   #- title: "Blogs"
-  #   url: /collection-archive/
+    url: http://johnboniello.com/Extended-Time-Calculator/
+  - title: "Research Roundup"
+    url: http://johnboniello.com/Research-round-up/
+  - title: "Blogs"
+    url: http://johnboniello.com/blog2/
   # - title: "Sitemap"
   #   url: /sitemap/
