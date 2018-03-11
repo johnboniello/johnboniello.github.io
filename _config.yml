@@ -17,9 +17,9 @@ description              : "Welcome to my site. On this site you will find my se
                               and my beta or fully active development projects. My goal is to make the hard stuff easier for teachers, 
                               this means summarizing research and writing programs that might be helpful, 
                                especially to teachers of students with disabilities and ELLs."
-url                      : "https://jbonz37.github.io"
+url                      : "http://johnboniello.com"
 baseurl                  : # the subpath of your site, e.g. "/blog"
-repository               :  jbonz37
+repository               :  johnboniello
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
 # breadcrumbs            : false # true, false (default)
 words_per_minute         : 200
@@ -92,7 +92,7 @@ social:
 analytics:
   provider               : false # false (default), "google", "google-universal", "custom"
   google:
-    tracking_id          :
+    tracking_id          : "UA-115065150-1"
 
 
 # Site Author
