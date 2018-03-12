@@ -207,6 +207,7 @@ plugins:
   - jekyll-feed
   - jemoji
   - jekyll-seo-tag
+  - jekyll-sitemap
 # mimic GitHub Pages with --safe
 whitelist:
   - jekyll-paginate
