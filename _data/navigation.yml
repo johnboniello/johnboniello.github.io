@@ -2,6 +2,8 @@
 main:
   - title: "Home"
     url: http://johnboniello.com/
+  - title: "Behavior Date Tracker"
+    url: http://johnboniello.com/behaviortracker
   - title: "Extended Time Calculator"
     url: http://johnboniello.com/Extended-Time-Calculator/
   - title: "Research Roundup"
