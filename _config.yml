@@ -17,7 +17,7 @@ description              : "Welcome to my site. On this site you will find my se
                               and my beta or fully active development projects. My goal is to make the hard stuff easier for teachers, 
                               this means summarizing research and writing programs that might be helpful, 
                                especially to teachers of students with disabilities and ELLs."
-url                      : "http://johnboniello.com"
+url                      : "https://johnboniello.com"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               :  johnboniello
 teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
