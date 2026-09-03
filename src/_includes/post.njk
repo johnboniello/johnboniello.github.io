@@ -1,0 +1,13 @@
+---
+layout: base.njk
+---
+<article class="wrap prose post">
+  <p class="post__back"><a href="/posts/">&larr; All posts</a></p>
+  <header class="post__header">
+    <h1>{{ title }}</h1>
+    <p class="post__meta">
+      <time datetime="{{ date | isoDate }}">{{ date | readableDate }}</time>
+    </p>
+  </header>
+  {{ content | safe }}
+</article>
