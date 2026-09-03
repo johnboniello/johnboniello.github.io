@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if title %}{{ title }} · {% endif %}{{ site.title }} — {{ site.tagline }}</title>
+  <meta name="description" content="{{ description or site.description }}">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  <meta property="og:title" content="{% if title %}{{ title }} · {% endif %}{{ site.title }}">
+  <meta property="og:description" content="{{ description or site.description }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="site-header__brand" href="/">
+        <span class="site-header__name">{{ site.title }}</span>
+        <span class="site-header__tagline">{{ site.tagline }}</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <button class="site-nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav-list">
+          <span></span><span></span><span></span>
+          <span class="sr-only">Menu</span>
+        </button>
+        <ul class="site-nav__list" id="site-nav-list">
+          {% for item in site.nav %}
+          <li><a href="{{ item.url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.text }}</a></li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    {{ content | safe }}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap site-footer__inner">
+      <p>&copy; {{ currentYear }} {{ site.author }}.</p>
+      <ul class="social-list">
+        {% for link in site.social %}
+        <li><a href="{{ link.url }}" rel="me noopener" target="_blank">{{ link.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('nav-toggle').addEventListener('click', function () {
+      var list = document.getElementById('site-nav-list');
+      var expanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', String(!expanded));
+      list.classList.toggle('is-open');
+    });
+  </script>
+</body>
+</html>
