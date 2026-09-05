@@ -20,13 +20,13 @@ description: Practical tools, research summaries, and consulting for teachers of
 <section class="wrap section" id="projects">
   <h2>Projects</h2>
   <div class="card-grid">
-    {% for project in site.projects %}
+    {%- for project in site.projects %}
     <div class="card">
       <h3>{{ project.title }}</h3>
       <p>{{ project.description }}</p>
       <a class="card__link" href="{{ project.url }}">{{ project.cta }} &rarr;</a>
     </div>
-    {% endfor %}
+    {%- endfor %}
   </div>
 </section>
 
@@ -37,13 +37,13 @@ description: Practical tools, research summaries, and consulting for teachers of
   </div>
   {% if collections.posts.length %}
   <ul class="post-list">
-    {% for post in collections.posts | limit(3) %}
+    {%- for post in collections.posts | limit(3) %}
     <li class="post-list__item">
       <a class="post-list__title" href="{{ post.url }}">{{ post.data.title }}</a>
       <time class="post-list__date" datetime="{{ post.date | isoDate }}">{{ post.date | readableDate }}</time>
       {% if post.data.summary %}<p class="post-list__summary">{{ post.data.summary }}</p>{% endif %}
     </li>
-    {% endfor %}
+    {%- endfor %}
   </ul>
   {% else %}
   <p class="muted">New posts will show up here once they're published.</p>
