@@ -15,7 +15,7 @@ module.exports = {
     {
       title: "Behavior Referral Tracker",
       description:
-        "A free three-file system that helps teachers submit behavior referrals faster and lets administrators track and follow up on them, with built-in data visualization.",
+        "A free, role-based referral and case-management system for schools — submit, assign, and close referrals with a built-in analytics dashboard, running entirely inside your district's own Google Workspace.",
       url: "https://johnboniello.com/Behavior-Tracker",
       cta: "Learn more",
     },
