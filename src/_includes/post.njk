@@ -2,7 +2,11 @@
 layout: base.njk
 ---
 <article class="wrap prose post">
+  {% if tags == "roundup" %}
+  <p class="post__back"><a href="/research-roundup/">&larr; All roundups</a></p>
+  {% else %}
   <p class="post__back"><a href="/posts/">&larr; All posts</a></p>
+  {% endif %}
   <header class="post__header">
     <h1>{{ title }}</h1>
     <p class="post__meta">

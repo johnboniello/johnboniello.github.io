@@ -23,7 +23,7 @@ module.exports = {
       title: "Research Roundup",
       description:
         "Semi-regular summaries of education research and reading — not always peer-reviewed, always aimed at what actually helps in the classroom.",
-      url: "https://johnboniello.com/Research-round-up/",
+      url: "/research-roundup/",
       cta: "Read the roundups",
     },
   ],
