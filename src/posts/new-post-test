@@ -1,0 +1,7 @@
+---
+layout: post.njk
+title: Your Post Title
+date: 2026-09-15
+summary: One sentence that shows up in the post list.
+---
+Your post content, written in normal markdown.
