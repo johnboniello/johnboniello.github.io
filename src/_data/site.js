@@ -9,6 +9,7 @@ module.exports = {
     { text: "Home", url: "/" },
     { text: "Posts", url: "/posts/" },
     { text: "Projects", url: "/#projects" },
+    { text: "Photography", url: "/photography/" },
     { text: "Consulting", url: "/consulting/" },
   ],
   projects: [

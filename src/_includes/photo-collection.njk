@@ -1,0 +1,83 @@
+---
+layout: base.njk
+---
+<article class="wrap section prose photo-collection">
+  <p class="post__back"><a href="/photography/">&larr; All collections</a></p>
+  <header class="post__header">
+    <h1>{{ title }}</h1>
+    {% if date %}<p class="post__meta"><time datetime="{{ date | isoDate }}">{{ date | readableDate }}</time></p>{% endif %}
+  </header>
+  {{ content | safe }}
+
+  <div class="photo-grid">
+    {%- for photo in photos %}
+    <button type="button" class="photo-grid__item" data-lightbox-trigger data-index="{{ loop.index0 }}">
+      <img src="/images/photography/{{ photo.src }}" alt="{{ photo.alt }}" loading="lazy">
+    </button>
+    {%- endfor %}
+  </div>
+</article>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" class="lightbox__close" id="lightboxClose" aria-label="Close">&times;</button>
+  <button type="button" class="lightbox__nav lightbox__nav--prev" id="lightboxPrev" aria-label="Previous photo">&larr;</button>
+  <figure class="lightbox__figure">
+    <img id="lightboxImg" src="" alt="">
+    <figcaption id="lightboxCaption"></figcaption>
+  </figure>
+  <button type="button" class="lightbox__nav lightbox__nav--next" id="lightboxNext" aria-label="Next photo">&rarr;</button>
+</div>
+
+<script>
+(function () {
+  var photos = {{ photos | dump | safe }};
+  var basePath = '/images/photography/';
+  var current = 0;
+
+  var lightbox = document.getElementById('lightbox');
+  var img = document.getElementById('lightboxImg');
+  var caption = document.getElementById('lightboxCaption');
+
+  function show(index) {
+    if (!photos.length) return;
+    current = (index + photos.length) % photos.length;
+    var p = photos[current];
+    img.src = basePath + p.src;
+    img.alt = p.alt || '';
+    caption.textContent = p.caption || '';
+    caption.hidden = !p.caption;
+  }
+
+  function open(index) {
+    show(index);
+    lightbox.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    lightbox.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('[data-lightbox-trigger]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      open(parseInt(btn.getAttribute('data-index'), 10));
+    });
+  });
+
+  document.getElementById('lightboxClose').addEventListener('click', close);
+  document.getElementById('lightboxPrev').addEventListener('click', function () { show(current - 1); });
+  document.getElementById('lightboxNext').addEventListener('click', function () { show(current + 1); });
+
+  lightbox.addEventListener('click', function (e) {
+    if (e.target === lightbox) close();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (lightbox.hidden) return;
+    if (e.key === 'Escape') close();
+    if (e.key === 'ArrowLeft') show(current - 1);
+    if (e.key === 'ArrowRight') show(current + 1);
+  });
+})();
+</script>
