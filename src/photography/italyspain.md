@@ -1,9 +1,9 @@
 ---
 layout: photo-collection.njk
-title: Coastal Maine
+title: Spain and Italy
 date: 2026-08-01
 cover: coastal-maine/01.jpg
-description: A few shots from a week on the coast.
+description: A few shots from our trip.
 photos:
   - src: coastal-maine/01.jpg
     alt: Rocky shoreline at sunset
@@ -23,4 +23,4 @@ photos:
     caption: Pemaquid Point Light
 tags: photocollection
 ---
-A few shots from a week on the coast — replace this collection with your own, or duplicate this file as a starting point for a new one.
+
