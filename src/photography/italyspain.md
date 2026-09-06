@@ -21,9 +21,9 @@ photos:
   - src: italyspain/3T0A9833.jpg
     alt: Med
     caption: Mediterranean sea from Palermo
-  -src: italyspain/3T0A0966.jpg
-   alt: streetscape
-   caption: a street in Valencia
+  - src: italyspain/3T0A0966.jpg
+    alt: streetscape
+    caption: a street in Valencia
 
 tags: photocollection
 ---
