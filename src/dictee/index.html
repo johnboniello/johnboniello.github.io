@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dictée FR</title>
+  <meta name="description" content="S'entraîner à l'orthographe française.">
+  <meta name="theme-color" content="#1565c0">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Dictée FR">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <button id="backBtn" hidden aria-label="Retour">←</button>
+    <h1 id="topTitle">Dictée FR</h1>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <section data-view="home" id="home">
+    <p class="muted">Choisis un jeu.</p>
+    <div class="menu">
+      <button class="big" data-go="scramble">🔤&nbsp; Lettres mélangées</button>
+      <button class="big" data-go="choice">🎯&nbsp; Le bon mot</button>
+      <button class="big" data-go="dictee">✏️&nbsp; Dictée sur papier</button>
+    </div>
+    <hr class="hr">
+    <div class="menu">
+      <button class="ghost" data-go="words">📚&nbsp; Gérer les mots</button>
+      <button class="ghost mt-sm" data-go="scan">📷&nbsp; Scanner une liste (photo)</button>
+    </div>
+    <div class="settings-row">
+      <label for="rate" class="muted">Vitesse de la voix</label>
+      <select id="rate">
+        <option value="0.5">Très lente</option>
+        <option value="0.7">Lente</option>
+        <option value="0.9">Normale</option>
+        <option value="1.1">Assez rapide</option>
+        <option value="1.3">Rapide</option>
+      </select>
+    </div>
+    <p class="muted mt" id="wordCount"></p>
+    <p class="muted" id="installHint" hidden>Astuce : ajoute l'appli à l'écran d'accueil (menu Partager → « Sur l'écran d'accueil »).</p>
+  </section>
+
+  <!-- ================= SCRAMBLE ================= -->
+  <section data-view="scramble" id="scramble">
+    <p class="progress" id="scrProgress"></p>
+    <p class="muted" id="scrEmpty" hidden>Ajoute d'abord des mots (« Gérer les mots »).</p>
+    <div id="scrControls" class="btn-row">
+      <button id="scrListen">🔊 Écouter</button>
+      <button id="scrHint">💡 Indice</button>
+      <button id="scrSpell">🔊 Épeler</button>
+    </div>
+    <div id="board">
+      <div id="slots"></div>
+      <div id="tray"></div>
+    </div>
+    <p class="feedback" id="scrFeedback"></p>
+    <button class="wide" id="scrNext" hidden>➡️ Mot suivant</button>
+  </section>
+
+  <!-- ================= CHOICE ================= -->
+  <section data-view="choice" id="choice">
+    <p class="progress" id="choiceProgress"></p>
+    <p class="muted" id="choiceEmpty" hidden>Ajoute d'abord des mots (« Gérer les mots »).</p>
+    <button class="wide big" id="choiceListen">🔊 Écouter le mot</button>
+    <p class="label" id="choiceInstruction">Choisis la bonne orthographe :</p>
+    <button class="opt" data-opt="0"></button>
+    <button class="opt" data-opt="1"></button>
+    <button class="opt" data-opt="2"></button>
+    <button class="opt" data-opt="3"></button>
+    <p class="feedback" id="choiceFeedback"></p>
+    <button class="wide" id="choiceNext" hidden>➡️ Mot suivant</button>
+  </section>
+
+  <!-- ================= DICTÉE ================= -->
+  <section data-view="dictee" id="dictee">
+    <p class="progress" id="dictProgress"></p>
+    <p class="muted" id="dictEmpty" hidden>Ajoute d'abord des mots (« Gérer les mots »).</p>
+    <div id="dictBody">
+      <button class="wide big" id="dictListen">🔊 Écouter le mot</button>
+      <button class="wide mt-sm" id="dictRepeat">🔁 Réécouter</button>
+      <div class="btn-row mt-sm">
+        <button id="dictHint">💡 Indice</button>
+        <button id="dictSpell">🔊 Épeler lentement</button>
+      </div>
+      <hr class="hr">
+      <p class="muted">✏️ Écris le mot sur ta feuille, puis saisis les lettres :</p>
+      <p class="hint" id="dictHintLine" hidden></p>
+      <p class="guess" id="dictGuess">— — —</p>
+      <div id="keyboard"></div>
+      <div class="btn-row mt-sm">
+        <button id="dictBack">⌫ Une lettre</button>
+        <button id="dictClear">Tout effacer</button>
+      </div>
+      <button class="wide big mt-sm" id="dictCheck">✅ Vérifier</button>
+
+      <div class="card" id="dictResult" hidden>
+        <div class="answer-row" id="dictAnswerRow">
+          <div class="cap">Bonne réponse :</div>
+          <div class="word" id="dictTarget"></div>
+        </div>
+        <div class="cap">Ta réponse :</div>
+        <div class="word" id="dictYours"></div>
+        <div class="summary" id="dictSummary"></div>
+        <div class="btn-row">
+          <button id="dictHear">🔊 Écouter</button>
+          <button id="dictRetry">↺ Réessayer</button>
+          <button id="dictReveal" hidden>👁 Réponse</button>
+          <button id="dictNext">➡️ Suivant</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORDS ================= -->
+  <section data-view="words" id="words">
+    <p class="muted">Ajoute les mots de la semaine — un par ligne, ou colle une liste séparée par des virgules.</p>
+    <textarea id="wordInput" placeholder="pomme, école, fenêtre"></textarea>
+    <button class="wide mt-sm" id="wordAdd">Ajouter</button>
+    <hr class="hr">
+    <p class="progress" id="wordCountList">0 mot</p>
+    <div class="wordlist" id="wordList"></div>
+  </section>
+
+  <!-- ================= SCAN ================= -->
+  <section data-view="scan" id="scan">
+    <p class="muted">Prends en photo la liste de mots — ça marche mieux avec un mot par ligne, bien à plat et bien éclairé.</p>
+    <label class="btn big wide" for="scanFile">📷 Prendre une photo</label>
+    <input type="file" id="scanFile" accept="image/*" capture="environment">
+    <p class="muted mt" id="scanStatus">Les mots trouvés apparaîtront ici pour que tu les vérifies.</p>
+    <textarea id="scanReview" placeholder="un mot par ligne"></textarea>
+    <button class="wide mt-sm" id="scanAdd">Ajouter à la liste</button>
+  </section>
+
+</div>
+<script src="./app.js"></script>
+</body>
+</html>

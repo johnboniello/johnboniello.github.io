@@ -6,6 +6,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/images");
   eleventyConfig.addPassthroughCopy("src/CNAME");
   eleventyConfig.addPassthroughCopy("src/favicon.svg");
+  // Dictée FR — self-contained PWA, copied verbatim to /dictee/
+  eleventyConfig.addPassthroughCopy("src/dictee");
 
   // Watch CSS for live-reload while running `npm start`
   eleventyConfig.addWatchTarget("src/css/");

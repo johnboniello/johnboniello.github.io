@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Installer Dictée FR</title>
+  <meta name="theme-color" content="#1565c0">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    #app { max-width: 620px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; margin-top: 28px; }
+    ol { padding-left: 20px; }
+    li { margin: 8px 0; }
+    .dl {
+      display: inline-block; background: var(--blue); color: #fff;
+      text-decoration: none; padding: 14px 20px; border-radius: 12px; font-size: 18px; margin: 6px 0;
+    }
+    .note { background: #eef2f7; border-radius: 10px; padding: 12px 14px; color: var(--blue-dark); }
+    a { color: var(--blue); }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar"><h1>Installer « Dictée FR »</h1></div>
+
+  <h2>Sur iPhone / iPad — rien à installer</h2>
+  <p>Ouvre <a href="./">l'appli web</a> dans Safari, puis <strong>Partager → « Sur l'écran d'accueil »</strong>. Elle s'ouvre ensuite comme une vraie appli, hors ligne.</p>
+
+  <h2>Sur Android — installer l'appli</h2>
+  <p><a class="dl" id="apk" href="https://github.com/johnboniello/french-dictee/releases/latest/download/dictee-fr.apk">⬇️ Télécharger dictee-fr.apk</a></p>
+  <p class="muted">Android 8.0 ou plus récent · ~24 Mo</p>
+  <ol>
+    <li>Sur le téléphone, appuie sur le bouton de téléchargement ci-dessus.</li>
+    <li>Ouvre le fichier <code>dictee-fr.apk</code> (dans les notifications ou l'appli « Fichiers »).</li>
+    <li>Android affiche « Pour votre sécurité… ». Appuie sur <strong>Paramètres</strong>, active
+      <strong>« Autoriser depuis cette source »</strong>, reviens en arrière, puis <strong>Installer</strong>.</li>
+    <li>Si un avertissement « application non vérifiée » apparaît (Play Protect), choisis
+      <strong>« Installer quand même »</strong> — c'est normal pour une appli qui n'est pas sur le Play Store.</li>
+    <li>Ouvre <strong>Dictée FR</strong>. Au premier usage de l'appareil photo, autorise l'accès.</li>
+  </ol>
+
+  <div class="note">
+    L'appli web et l'appli Android sont identiques. Sur Android, l'appli te laisse aussi scanner
+    une liste de mots par photo (reconnaissance hors ligne) ; la version web le fait aussi mais
+    plus lentement.
+  </div>
+
+  <p style="margin-top:28px"><a href="./">← Ouvrir l'appli web</a></p>
+</div>
+</body>
+</html>
