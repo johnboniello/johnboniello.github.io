@@ -8,6 +8,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/favicon.svg");
   // Dictée FR — self-contained PWA, copied verbatim to /dictee/
   eleventyConfig.addPassthroughCopy("src/dictee");
+  // Conjugaison FR — self-contained PWA, copied verbatim to /conjugaison/
+  eleventyConfig.addPassthroughCopy("src/conjugaison");
 
   // Watch CSS for live-reload while running `npm start`
   eleventyConfig.addWatchTarget("src/css/");

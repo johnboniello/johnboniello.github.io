@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Conjugaison FR</title>
+  <meta name="description" content="S'entraîner à la conjugaison française.">
+  <meta name="theme-color" content="#5e35b1">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Conjugaison FR">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <button id="backBtn" hidden aria-label="Retour">←</button>
+    <h1 id="topTitle">Conjugaison FR</h1>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <section data-view="home" id="home">
+    <p class="muted">Niveau</p>
+    <div class="level-row" id="levelRow">
+      <button data-lvl="1">Niveau 1</button>
+      <button data-lvl="2">Niveau 2</button>
+      <button data-lvl="3">Niveau 3</button>
+      <button data-lvl="4">Niveau 4</button>
+    </div>
+    <p class="level-desc" id="levelDesc"></p>
+
+    <div class="menu">
+      <button class="big" data-go="m1">✍️&nbsp; Conjugue</button>
+      <button class="big" data-go="m2">📝&nbsp; En contexte</button>
+      <button class="big" data-go="m3">🎯&nbsp; Choix multiple</button>
+    </div>
+
+    <hr class="hr">
+    <button class="ghost wide" data-go="verbs">📚&nbsp; Choisir les verbes</button>
+
+    <div class="settings-row">
+      <label for="rate" class="muted">Vitesse de la voix</label>
+      <select id="rate">
+        <option value="0.5">Très lente</option>
+        <option value="0.7">Lente</option>
+        <option value="0.9">Normale</option>
+        <option value="1.1">Assez rapide</option>
+        <option value="1.3">Rapide</option>
+      </select>
+    </div>
+    <p class="muted mt" id="verbCount"></p>
+    <p class="muted" id="installHint" hidden>Astuce : ajoute l'appli à l'écran d'accueil (menu Partager → « Sur l'écran d'accueil »).</p>
+  </section>
+
+  <!-- ============ MODE 1 — CONJUGUE ============ -->
+  <section data-view="m1" id="m1">
+    <p class="progress" id="m1Progress"></p>
+    <p class="muted" id="m1Empty" hidden>Aucun verbe actif. Va dans « Choisir les verbes ».</p>
+    <div id="m1Body">
+      <div class="prompt" id="m1Prompt"></div>
+      <div class="btn-row mt-sm">
+        <button id="m1Hint">💡 Indice</button>
+        <button id="m1Reveal2" hidden>👁 Réponse</button>
+      </div>
+      <p class="hint" id="m1HintLine" hidden></p>
+      <p class="guess" id="m1Guess">—</p>
+      <div id="m1Keyboard" class="kb"></div>
+      <div class="btn-row mt-sm">
+        <button id="m1Back">⌫ Une lettre</button>
+        <button id="m1Clear">Tout effacer</button>
+      </div>
+      <button class="wide big mt-sm" id="m1Check">✅ Vérifier</button>
+
+      <div class="card" id="m1Result" hidden>
+        <div class="answer-row" id="m1AnswerRow">
+          <div class="cap">Bonne réponse :</div>
+          <div class="word" id="m1Target"></div>
+        </div>
+        <div class="cap">Ta réponse :</div>
+        <div class="word" id="m1Yours"></div>
+        <div class="summary" id="m1Summary"></div>
+        <div class="btn-row">
+          <button id="m1Retry">↺ Réessayer</button>
+          <button id="m1Next">➡️ Suivant</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 2 — EN CONTEXTE ============ -->
+  <section data-view="m2" id="m2">
+    <p class="progress" id="m2Progress"></p>
+    <p class="muted" id="m2Empty" hidden>Aucun verbe actif. Va dans « Choisir les verbes ».</p>
+    <div id="m2Body">
+      <div class="cloze" id="m2Cloze"></div>
+      <div class="btn-row mt-sm">
+        <button id="m2Listen">🔊 Écouter la phrase</button>
+        <button id="m2Hint">💡 Indice</button>
+        <button id="m2Reveal2" hidden>👁 Réponse</button>
+      </div>
+      <p class="hint" id="m2HintLine" hidden></p>
+      <p class="guess" id="m2Guess">—</p>
+      <div id="m2Keyboard" class="kb"></div>
+      <div class="btn-row mt-sm">
+        <button id="m2Back">⌫ Une lettre</button>
+        <button id="m2Clear">Tout effacer</button>
+      </div>
+      <button class="wide big mt-sm" id="m2Check">✅ Vérifier</button>
+
+      <div class="card" id="m2Result" hidden>
+        <div class="answer-row" id="m2AnswerRow">
+          <div class="cap">Bonne réponse :</div>
+          <div class="word" id="m2Target"></div>
+        </div>
+        <div class="cap">Ta réponse :</div>
+        <div class="word" id="m2Yours"></div>
+        <div class="summary" id="m2Summary"></div>
+        <div class="btn-row">
+          <button id="m2Retry">↺ Réessayer</button>
+          <button id="m2Next">➡️ Suivant</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MODE 3 — CHOIX MULTIPLE ============ -->
+  <section data-view="m3" id="m3">
+    <p class="progress" id="m3Progress"></p>
+    <p class="muted" id="m3Empty" hidden>Aucun verbe actif. Va dans « Choisir les verbes ».</p>
+    <div id="m3Body">
+      <div class="prompt" id="m3Prompt"></div>
+      <p class="label">Choisis la bonne forme :</p>
+      <button class="opt" data-opt="0"></button>
+      <button class="opt" data-opt="1"></button>
+      <button class="opt" data-opt="2"></button>
+      <button class="opt" data-opt="3"></button>
+      <p class="feedback" id="m3Feedback"></p>
+      <button class="wide" id="m3Next" hidden>➡️ Mot suivant</button>
+    </div>
+  </section>
+
+  <!-- ============ VERBS PICKER ============ -->
+  <section data-view="verbs" id="verbs">
+    <p class="muted">Coche les verbes à travailler. Les 3 jeux tirent au hasard parmi les verbes cochés.</p>
+    <div class="pick-tools">
+      <button id="pickAll">Tout cocher</button>
+      <button id="pickNone">Tout décocher</button>
+      <button id="pickCore">Verbes de base</button>
+      <button id="pickG1">Groupe 1 (-er)</button>
+      <button id="pickG2">Groupe 2 (-ir)</button>
+      <button id="pickG3">Groupe 3</button>
+    </div>
+    <p class="progress" id="pickCount"></p>
+    <div class="verbpick" id="verbPick"></div>
+  </section>
+
+</div>
+<script src="./app.js"></script>
+</body>
+</html>
