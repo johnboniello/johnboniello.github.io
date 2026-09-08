@@ -10,7 +10,7 @@ description: A French spelling app for kids
 
 This is an application for practicing French spelling. I worked with Claude code to build it for my daughter who is in 4th grade (CM1) at a French International School. She has loved it so far. 
 
-At her school the teacher gives her a list of words to practice every week. Since I don't speak French I always struggle to help her with her words. Last year her teacher was nice enough to send home recordings for us. This year I thought I'd have technology help! I have some coding knowledge, but this would have taken months for me to figure out on my own. 
+At her school the teacher gives her a list of words to practice every week. Since I don't speak French, I always struggle to help her with her words. Last year her teacher was nice enough to send home recordings for us. This year I thought I'd have technology help! I have some coding knowledge, but this would have taken months for me to figure out on my own. 
 
 ## How to use the application
 
@@ -36,7 +36,7 @@ This app has 3 modes:
 #### Information on documentation and downloading the APK (app) 
 For more information check out the documentation on [this page](https://johnboniello.com/dictee/install.html) or go to the github page if you are interested in the code. 
 
-The link above has installation instructions. If you want the app, click the download link below. This is ***only*** available for android. When you download it you will need to change your settings to allow unknown apps to install. Once it downloads and you click install you will have to click on advanced and bypass the playstore warning. Pease refeer to the page above for more detailed instructions. 
+The link above has installation instructions. If you want the app, click the download link below. This is ***only*** available for android. When you download it you will need to change your settings to allow unknown apps to install. Once it downloads and you click install you will have to click on advanced and bypass the playstore warning. Pease refer to the page above for more detailed instructions. 
 
 Contact me if you need help.  
 
