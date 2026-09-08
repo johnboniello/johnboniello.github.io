@@ -26,9 +26,12 @@ Word List: The application comes with 8 words built in. You can delete these eas
 ### App Modes
 
 This app has 3 modes: 
-1. Lettres mélangées - Mixed Letters - the correct letters are present and you have to drag them into the correct spot. The word is spoken by your system voice. 
-2. Le bon mot - The right word - This is multiple choice. The voice says the word and you have to choose the right spelling. 
-3. Dictée sur papier - Spell on paper - This is where the system will read a word and you can spell it on paper or directly on the app. The system will tell you yes or no and you can correct it. You can ask for the correct answer after three incorrect answers. 
+
+1. **Lettres mélangées** - *Mixed Letters* - the correct letters are present and you have to drag them into the correct spot. The word is spoken by your system voice.
+
+2. **Le bon mot** - *The right word* - This is multiple choice. The voice says the word and you have to choose the right spelling. 
+
+3. **Dictée sur papier** - *Spell on paper* - This is where the system will read a word and you can spell it on paper or directly on the app. The system will tell you yes or no and you can correct it. You can ask for the correct answer after three incorrect answers. 
 
 #### Information on documentation and downloading the APK (app) 
 For more information check out the documentation on [this page](https://johnboniello.com/dictee/install.html) or go to the github page if you are interested in the code. 
