@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Installer Conjugaison FR</title>
+  <meta name="theme-color" content="#5e35b1">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    #app { max-width: 620px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; margin-top: 28px; }
+    ol { padding-left: 20px; }
+    li { margin: 8px 0; }
+    .dl {
+      display: inline-block; background: var(--blue); color: #fff;
+      text-decoration: none; padding: 14px 20px; border-radius: 12px; font-size: 18px; margin: 6px 0;
+    }
+    .note { background: #ede7f6; border-radius: 10px; padding: 12px 14px; color: var(--blue-dark); }
+    a { color: var(--blue); }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar"><h1>Installer « Conjugaison FR »</h1></div>
+
+  <h2>Sur iPhone / iPad — rien à installer</h2>
+  <p>Ouvre <a href="./">l'appli web</a> dans Safari, puis <strong>Partager → « Sur l'écran d'accueil »</strong>. Elle s'ouvre ensuite comme une vraie appli, hors ligne.</p>
+
+  <h2>Sur Android — installer l'appli</h2>
+  <p><a class="dl" id="apk" href="https://github.com/johnboniello/conjugaison-fr/releases/latest/download/conjugaison-fr.apk">⬇️ Télécharger conjugaison-fr.apk</a></p>
+  <p class="muted">Android 8.0 ou plus récent · ~5 Mo</p>
+  <ol>
+    <li>Sur le téléphone, appuie sur le bouton de téléchargement ci-dessus.</li>
+    <li>Ouvre le fichier <code>conjugaison-fr.apk</code> (dans les notifications ou l'appli « Fichiers »).</li>
+    <li>Android affiche « Pour votre sécurité… ». Appuie sur <strong>Paramètres</strong>, active
+      <strong>« Autoriser depuis cette source »</strong>, reviens en arrière, puis <strong>Installer</strong>.</li>
+    <li>Si un avertissement « application non vérifiée » apparaît (Play Protect), choisis
+      <strong>« Installer quand même »</strong> — c'est normal pour une appli qui n'est pas sur le Play Store.</li>
+    <li>Ouvre <strong>Conjugaison FR</strong>.</li>
+  </ol>
+
+  <div class="note">
+    L'appli web et l'appli Android sont identiques : 4 niveaux et 3 jeux
+    (Conjugue, En contexte, Choix multiple), avec le même son et « Bravo ! ».
+    Rien à créer comme compte, aucune donnée envoyée.
+  </div>
+
+  <p style="margin-top:28px"><a href="./">← Ouvrir l'appli web</a></p>
+</div>
+</body>
+</html>
