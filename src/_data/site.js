@@ -11,6 +11,8 @@ module.exports = {
     { text: "Projects", url: "/#projects" },
     { text: "Photography", url: "/photography/" },
     { text: "Consulting", url: "/consulting/" },
+    { text: "Dictée FR", url: "/projects/dictee-fr/"}
+    { text: "Conjugaison FR", url: "/projects/conjugaison-fr/"}
   ],
   projects: [
     {
