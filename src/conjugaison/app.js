@@ -57,7 +57,8 @@
     subj: ["Il faut que {s} {b} {t}.", "Je veux que {s} {b} {t}.", "Il est important que {s} {b} {t}.", "Bien que {s} {b} {t}, ça va."],
     impe: ["{b} {t} maintenant !", "{b} {t}, s'il te plaît !", "{b} {t} tout de suite !", "Allez, {b} {t} !"],
   };
-  const BLANK = '<span class="blank">_____</span>';
+  const BLANK = "_____";
+  const BLANK_HTML = '<span class="blank">_____</span>';
 
   /* ---------------- storage ---------------- */
   const store = {
@@ -199,13 +200,13 @@
       if (ch.pIdx === 0) subj = /^[aàâäeéèêëiîïoôöuùûüyh]/i.test(ch.answer) ? "j’" : "je";
       else subj = PERSON[ch.pIdx];
       s = frame.replace("{s}", subj).replace("{b}", BLANK).replace("{t}", tail);
-      s = s.replace("j’ <span", "j’<span");
+      s = s.replace("j’ " + BLANK, "j’" + BLANK);
     }
     return s.replace(/\s+([.!?,])/g, "$1").replace(/\s{2,}/g, " ").trim();
   }
-  function clozeSpoken(ch, sentence) {
-    // strip HTML, replace blank with a pause for the "listen" button
-    return sentence.replace(/<[^>]+>/g, "___").replace("___", ", ... ,").replace(/\s{2,}/g, " ");
+  /** Spoken version of the sentence: the blank becomes a short pause, not "underscore". */
+  function clozeSpoken(sentence) {
+    return sentence.replace(BLANK, " … ").replace(/\s{2,}/g, " ").trim();
   }
 
   function m3Options(ch) {
@@ -390,13 +391,13 @@
       summary: "m2Summary", retry: "m2Retry", reveal2: "m2Reveal2", next: "m2Next", listen: "m2Listen" },
     {
       render: (ch, el) => {
-        const sentence = buildCloze(ch);
+        const sentence = buildCloze(ch); // plain text with the "_____" marker
         ch._sentence = sentence;
-        el("cloze").innerHTML = sentence +
+        el("cloze").innerHTML = esc(sentence).replace(BLANK, BLANK_HTML) +
           ` <span class="inf">(${esc(ch.inf)})</span>` +
           `<span class="tense">→ ${esc(ch.tenseName)} · ${esc(ch.personLabel)}</span>`;
       },
-      onListen: (ch) => { if (ch && ch._sentence) say(clozeSpoken(ch, ch._sentence)); },
+      onListen: (ch) => { if (ch && ch._sentence) say(clozeSpoken(ch._sentence)); },
     }
   );
 
