@@ -24,16 +24,20 @@
 
   <!-- ================= HOME ================= -->
   <section data-view="home" id="home">
-    <p class="muted">Choisis un jeu.</p>
+    <div class="mascot-wrap">
+      <span class="mascot-ring"><img src="./icons/mascot.png" alt="Mascotte : le coq"></span>
+    </div>
+    <div class="home-title">Dictée</div>
+    <p class="muted center">Choisis un jeu.</p>
     <div class="menu">
-      <button class="big" data-go="scramble">🔤&nbsp; Lettres mélangées</button>
-      <button class="big" data-go="choice">🎯&nbsp; Le bon mot</button>
-      <button class="big" data-go="dictee">✏️&nbsp; Dictée sur papier</button>
+      <button class="big m-blue" data-go="scramble">🔤&nbsp; Lettres mélangées</button>
+      <button class="big m-red" data-go="choice">🎯&nbsp; Le bon mot</button>
+      <button class="big m-gold" data-go="dictee">✏️&nbsp; Dictée sur papier</button>
     </div>
     <hr class="hr">
     <div class="menu">
       <button class="ghost" data-go="words">📚&nbsp; Gérer les mots</button>
-      <button class="ghost mt-sm" data-go="scan">📷&nbsp; Scanner une liste (photo)</button>
+      <button class="ghost red mt-sm" data-go="scan">📷&nbsp; Scanner une liste (photo)</button>
     </div>
     <div class="settings-row">
       <label for="rate" class="muted">Vitesse de la voix</label>
@@ -125,6 +129,18 @@
     <p class="muted">Ajoute les mots de la semaine — un par ligne, ou colle une liste séparée par des virgules.</p>
     <textarea id="wordInput" placeholder="pomme, école, fenêtre"></textarea>
     <button class="wide mt-sm" id="wordAdd">Ajouter</button>
+    <div class="sync-card" id="syncCard" hidden>
+      <h3>🔗 Partager la liste entre appareils</h3>
+      <p class="muted">Crée un code, puis saisis le même code sur l'autre appareil et appuie sur Synchroniser.</p>
+      <input type="text" id="codeInput" placeholder="code famille" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <div class="btn-row mt-sm">
+        <button class="ghost" id="genCodeBtn">🎲 Générer</button>
+        <button class="ghost" id="copyCodeBtn">📋 Copier</button>
+      </div>
+      <button class="wide mt-sm" id="syncBtn">🔄 Synchroniser maintenant</button>
+      <p class="muted" id="syncStatus"></p>
+    </div>
+
     <hr class="hr">
     <p class="progress" id="wordCountList">0 mot</p>
     <div class="wordlist" id="wordList"></div>

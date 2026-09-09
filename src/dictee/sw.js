@@ -1,5 +1,5 @@
 /* Dictée FR service worker — offline app shell + runtime caching. */
-const CACHE = "dictee-fr-v5";
+const CACHE = "dictee-fr-v6";
 const SHELL = [
   "./",
   "./index.html",
@@ -12,7 +12,8 @@ const SHELL = [
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-512-maskable.png",
-  "./icons/apple-touch-icon.png"
+  "./icons/apple-touch-icon.png",
+  "./icons/mascot.png"
 ];
 
 self.addEventListener("install", (e) => {

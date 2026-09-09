@@ -14,7 +14,22 @@
         return Array.isArray(r) ? r : DEFAULT_WORDS.slice();
       } catch { return DEFAULT_WORDS.slice(); }
     },
-    saveWords(a) { try { localStorage.setItem("df_words", JSON.stringify(a)); } catch {} },
+    saveWords(a) {
+      try {
+        localStorage.setItem("df_words", JSON.stringify(a));
+        localStorage.setItem("df_words_at", String(Date.now()));
+      } catch {}
+    },
+    saveWordsFromSync(a, ts) {
+      try {
+        localStorage.setItem("df_words", JSON.stringify(a));
+        localStorage.setItem("df_words_at", String(ts));
+        localStorage.setItem("df_synced_at", String(Date.now()));
+      } catch {}
+    },
+    wordsUpdatedAt() { const r = parseInt(localStorage.getItem("df_words_at"), 10); return isFinite(r) ? r : 0; },
+    familyCode() { return localStorage.getItem("df_code") || ""; },
+    setFamilyCode(c) { try { localStorage.setItem("df_code", c); } catch {} },
     rate() { const r = parseFloat(localStorage.getItem("df_rate")); return isFinite(r) ? r : 0.9; },
     setRate(r) { try { localStorage.setItem("df_rate", String(r)); } catch {} },
   };
@@ -75,7 +90,105 @@
   function feedback(kind) {
     try { const a = new Audio("./sfx/" + kind + ".wav"); a.play().catch(() => {}); } catch {}
     setTimeout(() => say(kind === "correct" ? "Bravo !" : "Essaie encore", { rate: 1 }), 380);
+    if (kind === "correct") celebrate.correct(); else celebrate.reset();
   }
+
+  /* ---------------- celebration (confetti + mascot pop) ---------------- */
+  const celebrate = (() => {
+    let streak = 0;
+    const COLORS = ["#1565c0", "#e23b3b", "#fac775", "#ffffff", "#85b7eb"];
+    const reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Hand-rolled canvas confetti — no external dependency, works offline.
+    function burst(big) {
+      if (reduced) return;
+      let cv = document.getElementById("confetti-canvas");
+      if (!cv) {
+        cv = document.createElement("canvas");
+        cv.id = "confetti-canvas";
+        document.body.appendChild(cv);
+      }
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const W = (cv.width = Math.floor(innerWidth * dpr));
+      const H = (cv.height = Math.floor(innerHeight * dpr));
+      const ctx = cv.getContext("2d");
+      const n = big ? 150 : 90;
+      const originY = H * 0.32;
+      const parts = [];
+      for (let i = 0; i < n; i++) {
+        const left = i % 2 === 0;
+        parts.push({
+          x: left ? W * 0.12 : W * 0.88,
+          y: originY + (Math.random() * 40 - 20) * dpr,
+          vx: (left ? 1 : -1) * (3 + Math.random() * 7) * dpr,
+          vy: -(6 + Math.random() * 8) * dpr,
+          w: (5 + Math.random() * 6) * dpr,
+          h: (8 + Math.random() * 8) * dpr,
+          rot: Math.random() * 6.28,
+          vr: (Math.random() - 0.5) * 0.5,
+          color: COLORS[(Math.random() * COLORS.length) | 0],
+          round: Math.random() < 0.35,
+        });
+      }
+      const g = 0.35 * dpr;
+      let alive = parts.length;
+      function frame() {
+        ctx.clearRect(0, 0, W, H);
+        alive = 0;
+        for (const p of parts) {
+          p.vy += g;
+          p.vx *= 0.99;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vr;
+          if (p.y > H + 30) continue;
+          alive++;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          if (p.round) {
+            ctx.beginPath();
+            ctx.arc(0, 0, p.w / 2, 0, 6.28);
+            ctx.fill();
+          } else {
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          }
+          ctx.restore();
+        }
+        if (alive) requestAnimationFrame(frame);
+        else cv.remove();
+      }
+      requestAnimationFrame(frame);
+    }
+
+    function popMascot(big) {
+      let m = document.getElementById("celebrate-mascot");
+      if (!m) {
+        m = document.createElement("img");
+        m.id = "celebrate-mascot";
+        m.src = "./icons/mascot.png";
+        m.alt = "";
+        document.body.appendChild(m);
+      }
+      m.style.width = m.style.height = (big ? 168 : 132) + "px";
+      m.classList.remove("show");
+      void m.offsetWidth;
+      m.classList.add("show");
+      clearTimeout(popMascot._t);
+      popMascot._t = setTimeout(() => m.classList.remove("show"), big ? 1500 : 1100);
+    }
+
+    return {
+      correct() {
+        streak++;
+        const big = streak % 3 === 0;
+        burst(big);
+        popMascot(big);
+      },
+      reset() { streak = 0; },
+    };
+  })();
 
   /* ---------------- spelling checker ---------------- */
   function checkSpelling(target, guess) {
@@ -657,7 +770,7 @@
 
   /* ================= WORDS ================= */
   const words = (() => {
-    function start() { render(); $("#wordInput").value = ""; }
+    function start() { render(); $("#wordInput").value = ""; sync.refresh(); }
     function render() {
       const list = store.words();
       $("#wordCountList").textContent = list.length === 1 ? "1 mot" : list.length + " mot" + (list.length ? "s" : "s");
@@ -690,7 +803,104 @@
       $("#wordInput").value = "";
       render();
     });
-    return { start };
+    return { start, render };
+  })();
+
+  /* ================= SYNC (family code) ================= */
+  const sync = (() => {
+    // Deploy worker/worker.js to Cloudflare, then paste its URL here (no trailing slash).
+    const SYNC_BASE_URL = "";
+
+    const ADJ = ["bleu", "rouge", "vert", "jaune", "rose", "gris", "petit", "grand", "joli", "sage", "vif", "doux", "fier", "calme"];
+    const NOUN = ["coq", "chat", "chien", "lion", "ours", "loup", "cerf", "pie", "pomme", "poire", "prune", "fleur", "arbre", "livre", "craie", "stylo"];
+
+    const configured = !!SYNC_BASE_URL;
+    const rnd = (a) => a[Math.floor(Math.random() * a.length)];
+    const newCode = () => `${rnd(NOUN)}-${rnd(ADJ)}-${1000 + Math.floor(Math.random() * 9000)}`;
+    const norm = (s) => String(s || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    const valid = (c) => /^[a-z0-9-]{4,40}$/.test(c);
+
+    function mergeLists(primary, other) {
+      const seen = new Set();
+      const out = [];
+      for (const w of primary) { const k = w.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(w); } }
+      for (const w of other) { const k = w.toLowerCase(); if (!seen.has(k)) { seen.add(k); out.push(w); } }
+      return out;
+    }
+
+    async function pull(code) {
+      const r = await fetch(`${SYNC_BASE_URL}/list/${code}`, { method: "GET" });
+      if (r.status === 404) return { empty: true };
+      if (!r.ok) throw new Error("serveur " + r.status);
+      const j = await r.json();
+      if (!Array.isArray(j.words)) return { empty: true };
+      return { words: j.words, updatedAt: j.updatedAt || 0 };
+    }
+
+    async function push(code, list, updatedAt) {
+      const r = await fetch(`${SYNC_BASE_URL}/list/${code}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ words: list, updatedAt }),
+      });
+      if (!r.ok) throw new Error("serveur " + r.status);
+      return r.json();
+    }
+
+    function setStatus(t) { $("#syncStatus").textContent = t; }
+
+    async function run() {
+      const code = norm($("#codeInput").value);
+      if (!valid(code)) { setStatus("Code invalide : 4 à 40 lettres, chiffres ou tirets."); return; }
+      $("#codeInput").value = code;
+      store.setFamilyCode(code);
+      $("#syncBtn").disabled = true;
+      setStatus("Synchronisation…");
+      try {
+        const local = store.words();
+        const remote = await pull(code);
+        const now = Date.now();
+        if (remote.empty) {
+          await push(code, local, now);
+          setStatus(`Envoyé ${local.length} mot(s). Saisis « ${code} » sur l'autre appareil.`);
+        } else {
+          const merged = mergeLists(local, remote.words);
+          const received = merged.length - local.length;
+          store.saveWordsFromSync(merged, now);
+          words.render();
+          await push(code, merged, now);
+          setStatus(received > 0 ? `À jour : ${merged.length} mot(s) (+${received} reçu(s)).` : `À jour : ${merged.length} mot(s).`);
+        }
+      } catch (e) {
+        setStatus("Échec : " + (e && e.message ? e.message : "réseau"));
+      } finally {
+        $("#syncBtn").disabled = false;
+      }
+    }
+
+    function init() {
+      if (!configured) return;
+      $("#syncCard").hidden = false;
+      $("#codeInput").value = store.familyCode();
+      $("#genCodeBtn").addEventListener("click", () => {
+        const cur = norm($("#codeInput").value);
+        if (valid(cur) && !window.confirm(`Remplacer le code « ${cur} » ? Un nouveau code ne verra pas la liste déjà partagée.`)) return;
+        $("#codeInput").value = newCode();
+      });
+      $("#copyCodeBtn").addEventListener("click", async () => {
+        const code = norm($("#codeInput").value);
+        if (!valid(code)) { setStatus("Crée d'abord un code."); return; }
+        store.setFamilyCode(code);
+        try { await navigator.clipboard.writeText(code); setStatus("Code copié : " + code); }
+        catch { setStatus("Code : " + code); }
+      });
+      $("#syncBtn").addEventListener("click", run);
+    }
+
+    // Re-fill the code field whenever the words view opens.
+    function refresh() { if (configured) $("#codeInput").value = store.familyCode(); }
+
+    return { init, refresh };
   })();
 
   /* ================= SCAN (OCR) ================= */
@@ -769,6 +979,7 @@
   })();
 
   /* ---------------- boot ---------------- */
+  sync.init();
   show("home");
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
