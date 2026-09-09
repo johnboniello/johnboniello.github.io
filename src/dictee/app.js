@@ -808,8 +808,8 @@
 
   /* ================= SYNC (family code) ================= */
   const sync = (() => {
-    // Deploy worker/worker.js to Cloudflare, then paste its URL here (no trailing slash).
-    const SYNC_BASE_URL = "";
+    // Cloudflare Worker from the app repo's worker/ dir (no trailing slash).
+    const SYNC_BASE_URL = "https://dictee-sync.johnboniello.workers.dev";
 
     const ADJ = ["bleu", "rouge", "vert", "jaune", "rose", "gris", "petit", "grand", "joli", "sage", "vif", "doux", "fier", "calme"];
     const NOUN = ["coq", "chat", "chien", "lion", "ours", "loup", "cerf", "pie", "pomme", "poire", "prune", "fleur", "arbre", "livre", "craie", "stylo"];
