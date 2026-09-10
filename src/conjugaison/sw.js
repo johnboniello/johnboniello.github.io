@@ -1,5 +1,5 @@
 /* Conjugaison FR service worker — offline app shell + runtime caching. */
-const CACHE = "conjugaison-fr-v5";
+const CACHE = "conjugaison-fr-v6";
 const SHELL = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const SHELL = [
   "./styles.css",
   "./manifest.webmanifest",
   "./install.html",
+  "./privacy.html",
   "./verbs.json",
   "./sfx/correct.wav",
   "./sfx/wrong.wav",
