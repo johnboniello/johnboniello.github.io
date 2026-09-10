@@ -1065,9 +1065,17 @@
 
     const configured = !!SYNC_BASE_URL;
     const rnd = (a) => a[Math.floor(Math.random() * a.length)];
-    const newCode = () => `${rnd(NOUN)}-${rnd(ADJ)}-${1000 + Math.floor(Math.random() * 9000)}`;
+    const ALNUM = "abcdefghijklmnopqrstuvwxyz0123456789";
+    function randStr(n) {
+      const buf = new Uint8Array(n);
+      (self.crypto || {}).getRandomValues ? crypto.getRandomValues(buf) : buf.forEach((_, i) => (buf[i] = (Math.random() * 256) | 0));
+      return [...buf].map((x) => ALNUM[x % ALNUM.length]).join("");
+    }
+    // Readable prefix so a parent recognises "their" code + 6 random chars so it
+    // isn't guessable: e.g. "coq-bleu-h7k2m9" (~40 bits).
+    const newCode = () => `${rnd(NOUN)}-${rnd(ADJ)}-${randStr(6)}`;
     const norm = (s) => String(s || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
-    const valid = (c) => /^[a-z0-9-]{4,40}$/.test(c);
+    const valid = (c) => /^[a-z0-9-]{8,40}$/.test(c);
 
     function mergeLists(primary, other) {
       const seen = new Set();
@@ -1139,7 +1147,7 @@
 
     async function run() {
       const code = norm($("#codeInput").value);
-      if (!valid(code)) { setStatus("Code invalide : 4 à 40 lettres, chiffres ou tirets."); return; }
+      if (!valid(code)) { setStatus("Code invalide : 8 à 40 lettres, chiffres ou tirets."); return; }
       $("#codeInput").value = code;
       store.setFamilyCode(code);
       $("#syncBtn").disabled = true;
