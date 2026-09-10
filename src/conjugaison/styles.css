@@ -1,13 +1,30 @@
 :root {
-  --blue: #5e35b1;
-  --blue-dark: #4527a0;
+  /* Violet-anchored take on the Dictée FR refresh — same soft, rounded style,
+     kept purple so the two apps stay tellable apart. */
+  --violet: #5e35b1;
+  --violet-dark: #4527a0;
+  --deep: #34176b;
   --ink: #1a1a1a;
   --muted: #5f6368;
-  --line: #cbd5e1;
+  --line: #ded2f0;
   --ok: #2e7d32;
   --bad: #c62828;
-  --bg: #ffffff;
+  --bg: #f3effb;
   --card: #ffffff;
+  --card-line: #d8ccef;
+
+  --m1: #d9c9f2;  --m1-on: #34176b;   /* Conjugue — violet */
+  --m2: #c9d2f2;  --m2-on: #23306b;   /* En contexte — périvenche */
+  --m3: #f0c8e2;  --m3-on: #6a1550;   /* Choix multiple — prune */
+
+  --pale: #ede7f6;  --pale-line: #c6b3e8;  --pale-on: #4527a0;
+
+  --radius: 16px;
+  --btn-min-h: 48px;
+
+  /* legacy aliases still referenced below */
+  --blue: var(--violet);
+  --blue-dark: var(--violet-dark);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -35,9 +52,9 @@ html, body {
   min-height: 40px;
   margin-bottom: 6px;
 }
-.topbar h1 { font-size: 20px; margin: 0; }
+.topbar h1 { font-size: 20px; margin: 0; color: var(--deep); }
 #backBtn {
-  border: 0; background: transparent; color: var(--blue);
+  border: 0; background: transparent; color: var(--violet);
   font-size: 22px; padding: 6px 8px; cursor: pointer; border-radius: 8px;
 }
 #backBtn[hidden] { display: none; }
@@ -47,26 +64,32 @@ section[data-view][hidden] { display: none; }
 button, .btn {
   font: inherit;
   color: #fff;
-  background: var(--blue);
+  background: var(--violet);
   border: 0;
-  border-radius: 12px;
-  padding: 13px 14px;
+  border-radius: var(--radius);
+  padding: 8px 16px;
+  min-height: var(--btn-min-h);
   cursor: pointer;
   text-align: center;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
-button:active { filter: brightness(0.94); }
+button:active { filter: brightness(0.96); }
 button:disabled { opacity: 0.55; }
 
-.btn-row { display: flex; gap: 8px; }
-.btn-row > button { flex: 1; min-width: 0; }
+.btn-row { display: flex; gap: 8px; align-items: stretch; }
+.btn-row > button { flex: 1 1 0; min-width: 0; }
 
-.big { font-size: 18px; padding: 17px 14px; }
-.wide { display: block; width: 100%; }
+.big { font-size: 18px; min-height: 54px; }
+.wide { display: flex; width: 100%; }
 .mt { margin-top: 12px; }
 .mt-sm { margin-top: 8px; }
 
-.ghost { background: #eef2f7; color: var(--blue-dark); }
-.hr { height: 1px; background: #dddddd; margin: 20px 0 14px; border: 0; }
+.ghost { background: var(--pale); color: var(--pale-on); border: 1px solid var(--pale-line); }
+.hr { height: 1px; background: var(--line); margin: 20px 0 14px; border: 0; }
 
 .progress { font-weight: 700; color: var(--ink); margin: 4px 0 10px; }
 .muted { color: var(--muted); font-size: 14px; }
@@ -74,47 +97,43 @@ button:disabled { opacity: 0.55; }
 .label { color: var(--ink); font-size: 15px; margin-top: 12px; }
 
 select {
-  font: inherit; padding: 10px; border-radius: 10px;
+  font: inherit; padding: 10px; border-radius: 12px;
   border: 1px solid var(--line); background: #fff; color: var(--ink);
 }
 
 /* ---- home ---- */
 #home h1 { font-size: 22px; }
+.mascot-wrap { text-align: center; margin: 4px 0 2px; }
+.mascot-ring {
+  width: 84px; height: 84px; border-radius: 50%;
+  background: #efe7fb; border: 2px solid #a98fdd;
+  display: inline-flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.mascot-ring img { width: 84px; height: 84px; }
+.home-title { text-align: center; font-size: 22px; font-weight: 700; color: var(--deep); margin: 8px 0 2px; }
 .menu button { width: 100%; margin-top: 12px; }
+.menu .m1 { background: var(--m1); color: var(--m1-on); }
+.menu .m2 { background: var(--m2); color: var(--m2-on); }
+.menu .m3 { background: var(--m3); color: var(--m3-on); }
 .settings-row { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
 
-/* ---- scramble ---- */
+/* ---- scramble (unused here, kept for parity) ---- */
 #board {
-  position: relative;
-  margin-top: 10px;
-  min-height: 300px;
-  background: #fafafa;
-  border-radius: 12px;
-  padding: 12px;
+  position: relative; margin-top: 10px; min-height: 300px;
+  background: #f4effb; border-radius: var(--radius); padding: 12px;
 }
-#slots, #tray {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
+#slots, #tray { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 #tray { margin-top: 28px; }
 .slot, .tile {
-  width: 46px; height: 46px;
-  border-radius: 10px;
+  width: 46px; height: 46px; border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
   font-size: 22px; font-weight: 700;
 }
-.slot {
-  border: 2px dashed #b0bec5;
-  background: rgba(0,0,0,0.04);
-}
+.slot { border: 2px dashed #b39ddb; background: rgba(0,0,0,0.04); }
 .slot-gap { width: 22px; height: 46px; }
 .tile {
-  border: 2px solid #90a4ae;
-  background: #fff; color: #1a1a1a;
-  touch-action: none; user-select: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+  border: 2px solid #9575cd; background: #fff; color: #1a1a1a;
+  touch-action: none; user-select: none; box-shadow: 0 1px 3px rgba(0,0,0,0.18);
 }
 .tile.drag { position: fixed; z-index: 999; transform: scale(1.12); pointer-events: none; }
 .tile.good { background: #e8f5e9; border-color: var(--ok); }
@@ -126,32 +145,31 @@ select {
 .feedback.bad { color: var(--bad); }
 
 /* ---- choice ---- */
-.opt { width: 100%; margin-top: 10px; font-size: 20px; padding: 15px 14px; }
-.opt.good { background: var(--ok); }
-.opt.bad { background: var(--bad); }
+.opt { width: 100%; margin-top: 10px; font-size: 20px; min-height: 58px; background: var(--violet); color: #fff; }
+.opt.good { background: var(--ok); color: #fff; }
+.opt.bad { background: var(--bad); color: #fff; }
 
-/* ---- dictée ---- */
-.hint { font-family: ui-monospace, Menlo, Consolas, monospace; color: #00695c; font-size: 18px; padding: 6px 0; }
+/* ---- typed modes ---- */
+.hint { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--violet-dark); font-size: 18px; padding: 6px 0; }
 .hint[hidden] { display: none; }
 .guess {
   font-family: ui-monospace, Menlo, Consolas, monospace;
-  text-align: center; font-size: 30px; font-weight: 700; padding: 12px;
-  letter-spacing: 2px;
+  text-align: center; font-size: 30px; font-weight: 700; padding: 12px; letter-spacing: 2px;
 }
-#keyboard {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-  margin-top: 4px;
+#keyboard, .kb {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 4px;
 }
-#keyboard button { padding: 10px 0; font-size: 18px; border-radius: 9px; }
-#keyboard button.space { grid-column: span 3; font-size: 13px; }
+#keyboard button, .kb button {
+  padding: 8px 0; font-size: 18px; border-radius: 11px; min-height: 40px;
+  background: var(--pale); color: var(--pale-on); border: 1px solid var(--pale-line);
+}
+#keyboard button.space, .kb button.space { grid-column: span 3; font-size: 13px; }
 
 .card {
   margin-top: 16px;
   background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  border: 1px solid var(--card-line);
+  border-radius: var(--radius);
   padding: 14px;
 }
 .card .cap { color: var(--muted); font-size: 14px; }
@@ -168,62 +186,55 @@ select {
 .word .under { text-decoration: underline; }
 .word .strike { text-decoration: line-through; }
 
-/* ---- words / scan ---- */
+/* ---- verbs picker ---- */
 textarea {
-  width: 100%; font: inherit; padding: 10px; border-radius: 10px;
+  width: 100%; font: inherit; padding: 10px; border-radius: 12px;
   border: 1px solid var(--line); background: #fff; color: var(--ink);
   min-height: 96px; resize: vertical;
 }
 .wordlist { margin-top: 6px; }
 .wordlist .row {
   display: flex; align-items: center; gap: 10px;
-  padding: 6px 0; border-bottom: 1px solid #eee;
+  padding: 6px 0; border-bottom: 1px solid #ece3f7;
 }
 .wordlist .row span { flex: 1; font-size: 18px; }
-.wordlist .row button { background: #eef2f7; color: var(--blue-dark); padding: 8px 12px; }
+.wordlist .row button { background: var(--pale); color: var(--pale-on); border: 1px solid var(--pale-line); padding: 8px 12px; min-height: 0; }
 
 input[type="file"] { display: none; }
 
 /* ---- conjugaison-specific ---- */
-.level-row { display: flex; gap: 6px; margin: 6px 0 2px; }
+.level-row { display: flex; gap: 6px; margin: 6px 0 2px; align-items: stretch; }
 .level-row button {
-  flex: 1; padding: 10px 4px; border-radius: 10px; font-size: 14px;
-  background: #ede7f6; color: var(--blue-dark);
+  flex: 1 1 0; min-width: 0; padding: 10px 4px; border-radius: 12px; font-size: 14px; min-height: 44px;
+  background: var(--pale); color: var(--pale-on); border: 1px solid var(--pale-line);
 }
-.level-row button.on { background: var(--blue); color: #fff; }
+.level-row button.on { background: var(--violet); color: #fff; border-color: var(--violet); }
 .level-desc { color: var(--muted); font-size: 13px; margin: 2px 0 6px; min-height: 1.3em; }
 
 .prompt {
-  background: #f3effa; border: 1px solid #d8ccf0; border-radius: 14px;
+  background: #f5f0fc; border: 1px solid var(--card-line); border-radius: var(--radius);
   padding: 16px; text-align: center; margin-top: 10px;
 }
-.prompt .verb { font-size: 26px; font-weight: 800; color: var(--blue-dark); }
+.prompt .verb { font-size: 26px; font-weight: 800; color: var(--deep); }
 .prompt .en { color: var(--muted); font-size: 14px; margin-top: 2px; }
 .prompt .spec { margin-top: 8px; font-size: 17px; }
 .prompt .spec b { color: var(--ink); }
-.prompt .tense { color: var(--blue-dark); font-style: italic; }
+.prompt .tense { color: var(--violet-dark); font-style: italic; }
 
 .cloze {
-  background: #f3effa; border: 1px solid #d8ccf0; border-radius: 14px;
+  background: #f5f0fc; border: 1px solid var(--card-line); border-radius: var(--radius);
   padding: 16px; margin-top: 10px; font-size: 19px; line-height: 1.7;
 }
 .cloze .blank {
-  display: inline-block; min-width: 62px; border-bottom: 3px solid var(--blue);
+  display: inline-block; min-width: 62px; border-bottom: 3px solid var(--violet);
   text-align: center; font-weight: 700; padding: 0 6px;
 }
-.cloze .inf { color: var(--blue-dark); font-weight: 700; }
+.cloze .inf { color: var(--violet-dark); font-weight: 700; }
 .cloze .tense { display: block; margin-top: 8px; color: var(--muted); font-size: 14px; font-style: italic; }
-
-.opt.good { background: var(--ok); }
-.opt.bad { background: var(--bad); }
 
 /* verb picker */
 .pick-tools { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-.pick-tools button { background: #ede7f6; color: var(--blue-dark); padding: 8px 12px; font-size: 13px; }
+.pick-tools button { background: var(--pale); color: var(--pale-on); border: 1px solid var(--pale-line); padding: 8px 12px; font-size: 13px; min-height: 0; }
 .verbpick { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; margin-top: 8px; }
 .verbpick label { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 16px; }
-.verbpick input { width: 20px; height: 20px; }
-
-.kb { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 4px; }
-.kb button { padding: 10px 0; font-size: 18px; border-radius: 9px; }
-.kb button.space { grid-column: span 3; font-size: 13px; }
+.verbpick input { width: 20px; height: 20px; accent-color: var(--violet); }
