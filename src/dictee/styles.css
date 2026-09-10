@@ -125,6 +125,9 @@ select {
 .menu .m-blue { background: var(--tri-blue); color: var(--tri-blue-on); }
 .menu .m-red { background: var(--tri-red); color: var(--tri-red-on); }
 .menu .m-gold { background: var(--tri-gold); color: var(--tri-gold-on); }
+.m-review { width: 100%; background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
+#reviewChooser { margin-top: 10px; padding: 12px; background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); }
+#reviewChooser .label { margin-top: 0; }
 .settings-row { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
 
 /* ---- scramble ---- */
@@ -229,6 +232,14 @@ input[type="text"] {
 }
 .wordlist .row span { flex: 1; font-size: 18px; }
 .wordlist .row button { background: var(--tri-blue-pale); color: var(--tri-blue-pale-on); border: 1px solid var(--tri-blue-pale-line); padding: 8px 12px; min-height: 0; }
+
+/* ---- review section (Gérer les mots) ---- */
+.review-card { margin-top: 16px; background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); padding: 14px; }
+.review-card h3 { margin: 0 0 4px; font-size: 15px; color: var(--navy); }
+.review-card .dots { color: var(--tri-blue-pale-on); letter-spacing: 2px; font-size: 13px; }
+.iconbtn { min-height: 0; padding: 6px 10px; background: var(--tri-blue-pale); color: var(--tri-blue-pale-on); border: 1px solid var(--tri-blue-pale-line); }
+.iconbtn.on { background: var(--tri-gold); color: var(--tri-gold-on); border-color: #e0a83c; }
+.wordlist .row .iconbtn { flex: 0 0 auto; }
 
 /* ---- sync card ---- */
 .sync-card { margin-top: 16px; background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); padding: 14px; }

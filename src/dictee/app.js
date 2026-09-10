@@ -20,19 +20,176 @@
         localStorage.setItem("df_words_at", String(Date.now()));
       } catch {}
     },
-    saveWordsFromSync(a, ts) {
+    saveWordsFromSync(a, ts, replacedAt) {
       try {
         localStorage.setItem("df_words", JSON.stringify(a));
         localStorage.setItem("df_words_at", String(ts));
+        if (replacedAt != null) localStorage.setItem("df_words_replaced_at", String(replacedAt));
         localStorage.setItem("df_synced_at", String(Date.now()));
       } catch {}
     },
+    replaceWords(a) {
+      try {
+        const now = Date.now();
+        localStorage.setItem("df_words", JSON.stringify(a));
+        localStorage.setItem("df_words_at", String(now));
+        localStorage.setItem("df_words_replaced_at", String(now));
+      } catch {}
+    },
     wordsUpdatedAt() { const r = parseInt(localStorage.getItem("df_words_at"), 10); return isFinite(r) ? r : 0; },
+    wordsReplacedAt() { const r = parseInt(localStorage.getItem("df_words_replaced_at"), 10); return isFinite(r) ? r : 0; },
     familyCode() { return localStorage.getItem("df_code") || ""; },
     setFamilyCode(c) { try { localStorage.setItem("df_code", c); } catch {} },
     rate() { const r = parseFloat(localStorage.getItem("df_rate")); return isFinite(r) ? r : 0.9; },
     setRate(r) { try { localStorage.setItem("df_rate", String(r)); } catch {} },
+    stats() {
+      try { const r = JSON.parse(localStorage.getItem("df_stats")); return r && typeof r === "object" ? r : {}; }
+      catch { return {}; }
+    },
+    saveStats(obj) {
+      try {
+        localStorage.setItem("df_stats", JSON.stringify(obj));
+        localStorage.setItem("df_stats_at", String(Date.now()));
+      } catch {}
+    },
+    saveStatsFromSync(obj, ts) {
+      try {
+        localStorage.setItem("df_stats", JSON.stringify(obj));
+        localStorage.setItem("df_stats_at", String(ts));
+      } catch {}
+    },
+    statsUpdatedAt() { const r = parseInt(localStorage.getItem("df_stats_at"), 10); return isFinite(r) ? r : 0; },
   };
+
+  /* ---------------- practice stats ("Mots à revoir") ---------------- */
+  const normWord = (s) => String(s || "").trim().toLowerCase();
+
+  const stats = (() => {
+    const AGE_OUT_MS = 28 * 24 * 60 * 60 * 1000; // 4 weeks with no miss -> graduated
+    const GRAD_BOX = 4;   // after a miss: 3 correct answers (box 1->2->3->4) graduates it
+    const MAX_BOX = 4;
+    const CAP = 18;       // most words in one review session
+
+    const now = () => Date.now();
+    const load = () => store.stats();
+    const save = (m) => store.saveStats(m);
+
+    function entryFor(m, word) {
+      const k = normWord(word);
+      if (!m[k]) m[k] = { text: word, box: 1, seen: 0, miss: 0, lastMissAt: 0, pinned: false };
+      return m[k];
+    }
+
+    /** Record one round's outcome for a word. missed = wrong at least once, or answer revealed. */
+    function record(word, missed) {
+      if (!word) return;
+      const m = load();
+      const e = entryFor(m, word);
+      e.text = word;
+      e.seen++;
+      if (missed) { e.box = 1; e.miss++; e.lastMissAt = now(); }
+      else { e.box = Math.min(MAX_BOX, e.box + 1); }
+      save(m);
+    }
+
+    const isAgedOut = (e) => !e.pinned && e.box < GRAD_BOX && e.lastMissAt > 0 && (now() - e.lastMissAt) > AGE_OUT_MS;
+    // On the list only if she has actually missed it (or it's pinned) and hasn't graduated.
+    const onList = (e) => e.pinned || (e.miss > 0 && e.box < GRAD_BOX && !isAgedOut(e));
+
+    /** Count of words currently due for review. */
+    function dueCount() {
+      const m = load();
+      return Object.values(m).filter(onList).length;
+    }
+
+    /** Words to practise this session: weighted toward box 1 / pinned, capped, shuffled. */
+    function poolWords() {
+      const m = load();
+      const due = Object.entries(m).filter(([, e]) => onList(e));
+      const bag = [];
+      for (const [, e] of due) {
+        const w = (e.box === 1 ? 3 : 1) + (e.pinned ? 2 : 0);
+        for (let i = 0; i < w; i++) bag.push(e.text);
+      }
+      shuffle(bag);
+      const out = [];
+      const seen = new Set();
+      for (const t of bag) { const k = normWord(t); if (!seen.has(k)) { seen.add(k); out.push(t); } if (out.length >= CAP) break; }
+      return out;
+    }
+
+    /** For the "Gérer les mots" review section: on-list entries, hardest first. */
+    function listForManage() {
+      const m = load();
+      return Object.values(m).filter(onList)
+        .sort((a, b) => (a.pinned - b.pinned) || (a.box - b.box) || (b.lastMissAt - a.lastMissAt))
+        .map((e) => ({ text: e.text, box: e.box, miss: e.miss, pinned: e.pinned }));
+    }
+
+    function master(word) {
+      const m = load();
+      const k = normWord(word);
+      if (m[k]) { m[k].box = MAX_BOX; m[k].pinned = false; save(m); }
+    }
+    function setPinned(word, on) {
+      const m = load();
+      const e = entryFor(m, word);
+      e.pinned = !!on;
+      save(m);
+    }
+    function isPinned(word) {
+      const e = load()[normWord(word)];
+      return !!(e && e.pinned);
+    }
+
+    /** Drop clearly-finished entries; nudge aged-out ones to graduated. Called on "Nouvelle semaine". */
+    function prune() {
+      const m = load();
+      let changed = false;
+      for (const k of Object.keys(m)) {
+        const e = m[k];
+        if (isAgedOut(e)) { e.box = GRAD_BOX; changed = true; }
+        if (!e.pinned && e.box >= GRAD_BOX && (e.lastMissAt === 0 || (now() - e.lastMissAt) > AGE_OUT_MS)) {
+          delete m[k]; changed = true;
+        }
+      }
+      if (changed) save(m);
+    }
+
+    function mergeInto(local, remote) {
+      const out = {};
+      for (const k of new Set([...Object.keys(local || {}), ...Object.keys(remote || {})])) {
+        const l = (local && local[k]) || null;
+        const r = (remote && remote[k]) || null;
+        if (l && !r) { out[k] = l; continue; }
+        if (r && !l) { out[k] = r; continue; }
+        out[k] = {
+          text: (l.text && l.text.length >= (r.text || "").length) ? l.text : (r.text || l.text),
+          box: Math.max(l.box || 1, r.box || 1),
+          seen: Math.max(l.seen || 0, r.seen || 0),
+          miss: Math.max(l.miss || 0, r.miss || 0),
+          lastMissAt: Math.max(l.lastMissAt || 0, r.lastMissAt || 0),
+          pinned: !!(l.pinned || r.pinned),
+        };
+      }
+      return out;
+    }
+
+    /** Remove every graduated (non-pinned) word from the store. Manual "tidy up". */
+    function clearMastered() {
+      const m = load();
+      let n = 0;
+      for (const k of Object.keys(m)) {
+        if (!m[k].pinned && !onList(m[k])) { delete m[k]; n++; }
+      }
+      if (n) save(m);
+      return n;
+    }
+
+    const boxDots = (box) => "●".repeat(Math.min(box, MAX_BOX)) + "○".repeat(Math.max(0, MAX_BOX - box));
+
+    return { record, dueCount, poolWords, listForManage, master, setPinned, isPinned, prune, clearMastered, mergeInto, boxDots };
+  })();
 
   /* ---------------- speech ---------------- */
   const canSpeak = "speechSynthesis" in window;
@@ -298,7 +455,12 @@
   }
 
   /* ---------------- routing ---------------- */
-  const TITLES = { home: "Dictée FR", scramble: "Lettres mélangées", choice: "Le bon mot", dictee: "Dictée sur papier", words: "Gérer les mots", scan: "Scanner une liste" };
+  const TITLES = { home: "Dictée FR", scramble: "Lettres mélangées", choice: "Le bon mot", dictee: "Écris le mot", words: "Gérer les mots", scan: "Scanner une liste" };
+  let reviewMode = false;
+  const sourceWords = () => (reviewMode ? stats.poolWords() : store.words());
+  const emptyMsg = () => (reviewMode
+    ? "Aucun mot à revoir pour l'instant. 🎉"
+    : "Ajoute d'abord des mots (« Gérer les mots »).");
   function show(view) {
     $$("[data-view]").forEach((s) => (s.hidden = s.dataset.view !== view));
     $("#backBtn").hidden = view === "home";
@@ -311,16 +473,36 @@
     $$("body > .tile").forEach((t) => t.remove());
     show("home");
   });
+  const game = (v) => ({ scramble, choice, dictee, words, scan }[v]);
   $$("[data-go]").forEach((b) => b.addEventListener("click", () => {
     const v = b.dataset.go;
-    ({ scramble, choice, dictee, words, scan }[v]).start();
+    reviewMode = false;
+    game(v).start();
+    show(v);
+  }));
+
+  $("#reviewBtn").addEventListener("click", () => {
+    $("#reviewChooser").hidden = !$("#reviewChooser").hidden;
+  });
+  $("#reviewCancel").addEventListener("click", () => { $("#reviewChooser").hidden = true; });
+  $$("[data-review]").forEach((b) => b.addEventListener("click", () => {
+    const v = b.dataset.review;
+    reviewMode = true;
+    $("#reviewChooser").hidden = true;
+    game(v).start();
     show(v);
   }));
 
   function refreshHome() {
+    reviewMode = false;
+    $("#reviewChooser").hidden = true;
     const n = store.words().length;
     $("#wordCount").textContent = n === 1 ? "1 mot dans la liste" : n + " mots dans la liste";
     $("#rate").value = String(store.rate());
+    const due = stats.dueCount();
+    const rb = $("#reviewBtn");
+    rb.hidden = due === 0;
+    rb.textContent = `🔁  Mots à revoir (${due})`;
     const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
     $("#installHint").hidden = !!standalone;
   }
@@ -333,7 +515,7 @@
 
   /* ================= SCRAMBLE ================= */
   const scramble = (() => {
-    let order = [], pos = 0, score = 0, aided = 0, solved = false, hinted = false;
+    let list = [], order = [], pos = 0, score = 0, aided = 0, solved = false, hinted = false, wrongThisWord = false;
     let slotChars = [];
     const wordStart = new Set();
 
@@ -342,13 +524,15 @@
     const slotEls = () => $$("#slots .slot");
     const tileIn = (s) => s.querySelector(".tile");
     const allFilled = () => slotEls().every((s) => tileIn(s));
-    const curWord = () => store.words()[order[pos]];
+    const curWord = () => list[order[pos]];
     const progressText = () =>
+      (reviewMode ? "Révision · " : "") +
       `Mot ${pos + 1} / ${order.length}     Score : ${score}` + (aided > 0 ? `   ·   avec aide : ${aided}` : "");
 
     function start() {
-      const w = store.words();
-      const empty = w.length === 0;
+      list = sourceWords();
+      const empty = list.length === 0;
+      $("#scrEmpty").textContent = emptyMsg();
       $("#scrEmpty").hidden = !empty;
       $("#board").hidden = empty;
       $("#scrControls").hidden = empty;
@@ -356,7 +540,7 @@
       $("#scrFeedback").textContent = "";
       $("#scrProgress").textContent = "";
       if (empty) return;
-      order = [...w.keys()];
+      order = [...list.keys()];
       shuffle(order);
       pos = 0; score = 0; aided = 0;
       round();
@@ -364,7 +548,7 @@
 
     function round() {
       cleanupOrphans();
-      solved = false; hinted = false;
+      solved = false; hinted = false; wrongThisWord = false;
       $("#scrFeedback").textContent = "";
       $("#scrFeedback").className = "feedback";
       $("#scrNext").hidden = true;
@@ -494,9 +678,11 @@
         $("#scrFeedback").textContent = hinted ? "Bravo ! (avec aide)" : "Bravo ! 🎉";
         if (hinted) aided++; else score++;
         $("#scrProgress").textContent = progressText();
+        stats.record(curWord(), wrongThisWord);
         feedback("correct");
         $("#scrNext").hidden = false;
       } else {
+        wrongThisWord = true;
         $("#scrFeedback").className = "feedback bad";
         $("#scrFeedback").textContent = "Pas tout à fait — les lettres en rouge reviennent.";
         feedback("wrong");
@@ -552,15 +738,17 @@
 
   /* ================= CHOICE ================= */
   const choice = (() => {
-    let order = [], pos = 0, score = 0, aided = 0, correctIdx = -1, solved = false, wrong = false;
+    let list = [], order = [], pos = 0, score = 0, aided = 0, correctIdx = -1, solved = false, wrong = false;
     const opts = $$("#choice .opt");
-    const curWord = () => store.words()[order[pos]];
+    const curWord = () => list[order[pos]];
     const prog = () =>
+      (reviewMode ? "Révision · " : "") +
       `Mot ${pos + 1} / ${order.length}     Score : ${score}` + (aided > 0 ? `   ·   avec aide : ${aided}` : "");
 
     function start() {
-      const w = store.words();
-      const empty = w.length === 0;
+      list = sourceWords();
+      const empty = list.length === 0;
+      $("#choiceEmpty").textContent = emptyMsg();
       $("#choiceEmpty").hidden = !empty;
       $("#choiceListen").hidden = empty;
       $("#choiceInstruction").hidden = empty;
@@ -569,7 +757,7 @@
       $("#choiceFeedback").textContent = "";
       $("#choiceProgress").textContent = "";
       if (empty) return;
-      order = [...w.keys()];
+      order = [...list.keys()];
       shuffle(order);
       pos = 0; score = 0; aided = 0;
       round();
@@ -605,6 +793,7 @@
         $("#choiceFeedback").textContent = wrong ? "Bravo ! (avec aide)" : "Bravo ! 🎉";
         if (wrong) aided++; else score++;
         $("#choiceProgress").textContent = prog();
+        stats.record(curWord(), wrong);
         feedback("correct");
         $("#choiceNext").hidden = false;
       } else {
@@ -636,11 +825,12 @@
   /* ================= DICTÉE ================= */
   const dictee = (() => {
     const KEYS = [..."abcdefghijklmnopqrstuvwxyz".split(""), "é", "è", "ê", "ë", "à", "â", "î", "ï", "ô", "û", "ù", "ü", "ç", "œ", "'", "-", " "];
-    let order = [], pos = 0, score = 0, aidedCount = 0;
-    let guess = "", scored = false, aided = false, revealCount = 0, attempts = 0, revealed = false;
+    let list = [], order = [], pos = 0, score = 0, aidedCount = 0;
+    let guess = "", scored = false, aided = false, revealCount = 0, attempts = 0, revealed = false, recorded = false;
     const REVEAL_AFTER = 3;
-    const curWord = () => store.words()[order[pos]];
+    const curWord = () => list[order[pos]];
     const prog = () =>
+      (reviewMode ? "Révision · " : "") +
       `Mot ${pos + 1} / ${order.length}     Score : ${score}` + (aidedCount > 0 ? `   ·   avec aide : ${aidedCount}` : "");
 
     let built = false;
@@ -663,13 +853,14 @@
 
     function start() {
       buildKeyboard();
-      const w = store.words();
-      const empty = w.length === 0;
+      list = sourceWords();
+      const empty = list.length === 0;
+      $("#dictEmpty").textContent = emptyMsg();
       $("#dictEmpty").hidden = !empty;
       $("#dictBody").hidden = empty;
       $("#dictProgress").textContent = "";
       if (empty) return;
-      order = [...w.keys()];
+      order = [...list.keys()];
       shuffle(order);
       pos = 0; score = 0; aidedCount = 0;
       round();
@@ -677,7 +868,7 @@
 
     function round() {
       guess = "";
-      scored = false; aided = false; revealed = false;
+      scored = false; aided = false; revealed = false; recorded = false;
       revealCount = 0; attempts = 0;
       $("#dictResult").hidden = true;
       $("#dictHintLine").hidden = true;
@@ -711,6 +902,7 @@
       const summary = $("#dictSummary");
       if (res.correct) {
         if (!scored) { if (aided || revealed) aidedCount++; else score++; scored = true; }
+        if (!recorded) { stats.record(curWord(), attempts > 0 || revealed); recorded = true; }
         $("#dictAnswerRow").hidden = false;
         $("#dictTarget").innerHTML = renderRow(res, true);
         summary.style.color = "var(--ok)";
@@ -745,6 +937,7 @@
     }
 
     function next() {
+      if (!recorded && attempts > 0) { stats.record(curWord(), true); recorded = true; }
       if (pos + 1 >= order.length) {
         endPrompt(score, aidedCount, order.length, () => { shuffle(order); pos = 0; score = 0; aidedCount = 0; round(); });
         return;
@@ -770,17 +963,28 @@
 
   /* ================= WORDS ================= */
   const words = (() => {
-    function start() { render(); $("#wordInput").value = ""; sync.refresh(); }
+    function start() { render(); renderReview(); $("#wordInput").value = ""; sync.refresh(); }
+
+    function makeRow(text, controls) {
+      const row = document.createElement("div");
+      row.className = "row";
+      const span = document.createElement("span");
+      span.textContent = text;
+      row.append(span, ...controls);
+      return row;
+    }
+
     function render() {
       const list = store.words();
       $("#wordCountList").textContent = list.length === 1 ? "1 mot" : list.length + " mot" + (list.length ? "s" : "s");
       const box = $("#wordList");
       box.innerHTML = "";
       list.forEach((w, idx) => {
-        const row = document.createElement("div");
-        row.className = "row";
-        const span = document.createElement("span");
-        span.textContent = w;
+        const pin = document.createElement("button");
+        pin.className = "iconbtn" + (stats.isPinned(w) ? " on" : "");
+        pin.title = "Toujours réviser ce mot";
+        pin.textContent = "📌";
+        pin.addEventListener("click", () => { stats.setPinned(w, !stats.isPinned(w)); render(); renderReview(); });
         const del = document.createElement("button");
         del.textContent = "Supprimer";
         del.addEventListener("click", () => {
@@ -789,21 +993,66 @@
           store.saveWords(cur);
           render();
         });
-        row.append(span, del);
+        box.appendChild(makeRow(w, [pin, del]));
+      });
+    }
+
+    function renderReview() {
+      const items = stats.listForManage();
+      $("#reviewSection").hidden = items.length === 0;
+      $("#reviewTitle").textContent = `🔁 Mots à revoir (${items.length})`;
+      const box = $("#reviewList");
+      box.innerHTML = "";
+      items.forEach((it) => {
+        const dots = document.createElement("span");
+        dots.className = "dots";
+        dots.textContent = stats.boxDots(it.box);
+        const ok = document.createElement("button");
+        ok.className = "iconbtn";
+        ok.title = "Elle le maîtrise";
+        ok.textContent = "✓";
+        ok.addEventListener("click", () => { stats.master(it.text); renderReview(); render(); });
+        const pin = document.createElement("button");
+        pin.className = "iconbtn" + (it.pinned ? " on" : "");
+        pin.title = "Toujours réviser ce mot";
+        pin.textContent = "📌";
+        pin.addEventListener("click", () => { stats.setPinned(it.text, !it.pinned); renderReview(); render(); });
+        const row = makeRow(it.text, [dots, ok, pin]);
         box.appendChild(row);
       });
     }
-    $("#wordAdd").addEventListener("click", () => {
+
+    function addFromInput(replace) {
       const parts = $("#wordInput").value.split(/[\n,;]+/).map((s) => s.trim()).filter(Boolean);
       if (!parts.length) { say("Écris au moins un mot"); return; }
-      const cur = store.words();
-      let added = 0;
-      for (const p of parts) if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
-      store.saveWords(cur);
-      $("#wordInput").value = "";
-      render();
+      if (replace) {
+        if (!window.confirm(`Remplacer la liste par ces ${parts.length} mots ?\n\nLes « Mots à revoir » sont gardés.`)) return;
+        stats.prune();
+        const uniq = [];
+        const seen = new Set();
+        for (const p of parts) { const k = p.toLowerCase(); if (!seen.has(k)) { seen.add(k); uniq.push(p); } }
+        store.replaceWords(uniq);
+        $("#wordInput").value = "";
+        render(); renderReview();
+        window.alert(`Nouvelle liste : ${uniq.length} mots.\nMots à revoir : ${stats.dueCount()}.`);
+      } else {
+        const cur = store.words();
+        let added = 0;
+        for (const p of parts) if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+        store.saveWords(cur);
+        $("#wordInput").value = "";
+        render();
+      }
+    }
+
+    $("#wordAdd").addEventListener("click", () => addFromInput(false));
+    $("#wordReplace").addEventListener("click", () => addFromInput(true));
+    $("#reviewClean").addEventListener("click", () => {
+      const n = stats.clearMastered();
+      renderReview();
+      say(n ? `${n} mots retirés` : "Rien à retirer");
     });
-    return { start, render };
+    return { start, render, renderReview };
   })();
 
   /* ================= SYNC (family code) ================= */
@@ -828,26 +1077,65 @@
       return out;
     }
 
-    async function pull(code) {
-      const r = await fetch(`${SYNC_BASE_URL}/list/${code}`, { method: "GET" });
+    async function pull(kind, code) {
+      const r = await fetch(`${SYNC_BASE_URL}/${kind}/${code}`, { method: "GET" });
       if (r.status === 404) return { empty: true };
       if (!r.ok) throw new Error("serveur " + r.status);
-      const j = await r.json();
-      if (!Array.isArray(j.words)) return { empty: true };
-      return { words: j.words, updatedAt: j.updatedAt || 0 };
+      return r.json();
     }
 
-    async function push(code, list, updatedAt) {
-      const r = await fetch(`${SYNC_BASE_URL}/list/${code}`, {
+    async function push(kind, code, body) {
+      const r = await fetch(`${SYNC_BASE_URL}/${kind}/${code}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ words: list, updatedAt }),
+        body: JSON.stringify(body),
       });
       if (!r.ok) throw new Error("serveur " + r.status);
       return r.json();
     }
 
     function setStatus(t) { $("#syncStatus").textContent = t; }
+
+    async function syncList(code, now) {
+      const local = store.words();
+      const localRep = store.wordsReplacedAt();
+      const remote = await pull("list", code);
+      if (remote.empty || !Array.isArray(remote.words)) {
+        await push("list", code, { words: local, updatedAt: now, replacedAt: localRep });
+        return `envoyé ${local.length} mot(s)`;
+      }
+      const remoteRep = remote.replacedAt || 0;
+      let merged, replacedAt, adopted = false;
+      if (remoteRep > localRep) {            // other device started a new week
+        merged = remote.words.slice();
+        replacedAt = remoteRep;
+        adopted = true;
+      } else if (localRep > remoteRep) {     // this device started a new week
+        merged = local.slice();
+        replacedAt = localRep;
+      } else {                               // same generation -> union
+        merged = mergeLists(local, remote.words);
+        replacedAt = localRep;
+      }
+      store.saveWordsFromSync(merged, now, replacedAt);
+      await push("list", code, { words: merged, updatedAt: now, replacedAt });
+      if (adopted) return `nouvelle liste : ${merged.length} mot(s)`;
+      const received = merged.filter((w) => !local.some((x) => x.toLowerCase() === w.toLowerCase())).length;
+      return received > 0 ? `${merged.length} mot(s) (+${received} reçu(s))` : `${merged.length} mot(s)`;
+    }
+
+    async function syncStats(code, now) {
+      const local = store.stats();
+      let remote;
+      try { remote = await pull("stats", code); }
+      catch { return "stats non synchronisées (serveur à mettre à jour)"; }
+      const remoteStats = (remote && !remote.empty && remote.stats && typeof remote.stats === "object") ? remote.stats : {};
+      const merged = stats.mergeInto(local, remoteStats);
+      store.saveStatsFromSync(merged, now);
+      try { await push("stats", code, { stats: merged, updatedAt: now }); }
+      catch { return "mots à revoir fusionnés (envoi à réessayer)"; }
+      return null;
+    }
 
     async function run() {
       const code = norm($("#codeInput").value);
@@ -857,20 +1145,12 @@
       $("#syncBtn").disabled = true;
       setStatus("Synchronisation…");
       try {
-        const local = store.words();
-        const remote = await pull(code);
         const now = Date.now();
-        if (remote.empty) {
-          await push(code, local, now);
-          setStatus(`Envoyé ${local.length} mot(s). Saisis « ${code} » sur l'autre appareil.`);
-        } else {
-          const merged = mergeLists(local, remote.words);
-          const received = merged.length - local.length;
-          store.saveWordsFromSync(merged, now);
-          words.render();
-          await push(code, merged, now);
-          setStatus(received > 0 ? `À jour : ${merged.length} mot(s) (+${received} reçu(s)).` : `À jour : ${merged.length} mot(s).`);
-        }
+        const listText = await syncList(code, now);
+        const statsNote = await syncStats(code, now);
+        words.render();
+        words.renderReview();
+        setStatus(`À jour : ${listText}.` + (statsNote ? " " + statsNote : ""));
       } catch (e) {
         setStatus("Échec : " + (e && e.message ? e.message : "réseau"));
       } finally {

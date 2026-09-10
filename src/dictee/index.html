@@ -32,7 +32,15 @@
     <div class="menu">
       <button class="big m-blue" data-go="scramble">🔤&nbsp; Lettres mélangées</button>
       <button class="big m-red" data-go="choice">🎯&nbsp; Le bon mot</button>
-      <button class="big m-gold" data-go="dictee">✏️&nbsp; Dictée sur papier</button>
+      <button class="big m-gold" data-go="dictee">✏️&nbsp; Écris le mot</button>
+    </div>
+    <button class="big m-review mt" id="reviewBtn" hidden></button>
+    <div id="reviewChooser" class="menu" hidden>
+      <p class="label center">Comment veux-tu réviser ?</p>
+      <button class="ghost" data-review="scramble">🔤&nbsp; Lettres mélangées</button>
+      <button class="ghost mt-sm" data-review="choice">🎯&nbsp; Le bon mot</button>
+      <button class="ghost mt-sm" data-review="dictee">✏️&nbsp; Écris le mot</button>
+      <button class="ghost mt-sm" id="reviewCancel">Annuler</button>
     </div>
     <hr class="hr">
     <div class="menu">
@@ -128,7 +136,18 @@
   <section data-view="words" id="words">
     <p class="muted">Ajoute les mots de la semaine — un par ligne, ou colle une liste séparée par des virgules.</p>
     <textarea id="wordInput" placeholder="pomme, école, fenêtre"></textarea>
-    <button class="wide mt-sm" id="wordAdd">Ajouter</button>
+    <div class="btn-row mt-sm">
+      <button id="wordAdd">➕ Ajouter</button>
+      <button class="ghost" id="wordReplace">🗓️ Nouvelle semaine</button>
+    </div>
+
+    <div class="review-card" id="reviewSection" hidden>
+      <h3 id="reviewTitle">🔁 Mots à revoir</h3>
+      <p class="muted">Les mots qu'elle rate reviennent ici jusqu'à ce qu'elle les réussisse plusieurs fois.</p>
+      <div class="wordlist" id="reviewList"></div>
+      <button class="ghost mt-sm" id="reviewClean">🧹 Retirer les mots maîtrisés</button>
+    </div>
+
     <div class="sync-card" id="syncCard" hidden>
       <h3>🔗 Partager la liste entre appareils</h3>
       <p class="muted">Crée un code, puis saisis le même code sur l'autre appareil et appuie sur Synchroniser.</p>
