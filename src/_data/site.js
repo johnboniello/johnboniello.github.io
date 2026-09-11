@@ -2,32 +2,37 @@ module.exports = {
   title: "John Boniello",
   tagline: "Helping Educators with the Difficult Stuff",
   description:
-    "Practical tools, research summaries, and (soon) consulting for teachers of students with disabilities and English Language Learners.",
+    "Practical tools and research summaries for teachers of students with disabilities and English Language Learners.",
   url: "https://johnboniello.com",
   author: "John Boniello",
   nav: [
-    { text: "Home", url: "/" },
-    { text: "Posts", url: "/posts/" },
+    { text: "Writing", url: "/posts/" },
     { text: "Projects", url: "/#projects" },
     { text: "Photography", url: "/photography/" },
-    { text: "Consulting", url: "/consulting/" },
-    { text: "Dictée FR", url: "/projects/dictee-fr/"},
-    { text: "Conjugaison FR", url: "/projects/conjugaison-fr/"},
   ],
   projects: [
     {
       title: "Behavior Referral Tracker",
       description:
-        "A free, role-based referral and case-management system for schools — submit, assign, and close referrals with a built-in analytics dashboard, running entirely inside your district's own Google Workspace.",
+        "Role-based referral and case management for schools, running entirely inside your district's Google Workspace.",
       url: "https://johnboniello.com/Behavior-Tracker",
-      cta: "Learn more",
+      cta: "Explore",
     },
     {
-      title: "Research Roundup",
+      title: "Dictée FR",
       description:
-        "Semi-regular summaries of education research and reading — not always peer-reviewed, always aimed at what actually helps in the classroom.",
-      url: "/research-roundup/",
-      cta: "Read the roundups",
+        "A French dictée practice app, built as an installable PWA for daily practice.",
+      url: "/projects/dictee-fr/",
+      cta: "Explore",
+      image: "/images/projects/dictee.png",
+    },
+    {
+      title: "Conjugaison FR",
+      description:
+        "A companion PWA for practicing French verb conjugation, covering 261 verbs.",
+      url: "/projects/conjugaison-fr/",
+      cta: "Explore",
+      image: "/images/projects/conjugaison.png",
     },
   ],
   social: [
