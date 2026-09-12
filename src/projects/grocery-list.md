@@ -13,8 +13,9 @@ You pick your household's diet restrictions (dairy-free, gluten-free, vegan, low
 
 ## How to use the application
 
-There is no web version of this one, it is Android only for now.
+There are two ways to use this application: open it in the browser or install the Android app. Both talk to the same backend, so a household created on one works fine on the other.
 
+- [Open the web app](/grocery/)
 - [Download the Android APK](https://github.com/johnboniello/Grocery-list-app/releases/latest/download/app-release.apk)
 
 ### How it works
@@ -30,6 +31,7 @@ This is only available for Android right now. When you download it, you will nee
 
 Contact me if you get stuck.
 
+- [Open the web app](/grocery/)
 - [Source on GitHub](https://github.com/johnboniello/Grocery-list-app)
 - [Download the Android APK](https://github.com/johnboniello/Grocery-list-app/releases/latest/download/app-release.apk)
 
