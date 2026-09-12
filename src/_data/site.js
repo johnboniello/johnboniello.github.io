@@ -19,6 +19,14 @@ module.exports = {
       cta: "Explore",
     },
     {
+      title: "Grocery List",
+      description:
+        "A shared household grocery list app that flags items against your diet restrictions as you shop.",
+      url: "/projects/grocery-list/",
+      cta: "Explore",
+      image: "/images/projects/grocery-list.svg",
+    },
+    {
       title: "Dictée FR",
       description:
         "A French dictée practice app, built as an installable PWA for daily practice.",
