@@ -7,9 +7,9 @@ description: A shared household grocery list with diet-restriction highlighting.
 
 # Grocery List App
 
-This one is for my own house. My partner and I split the grocery shopping, and between the two of us we are juggling a few different diet restrictions at the same time. Every shared grocery list app we tried made us stop and think, "wait, can they actually eat that one?" So I worked with Claude Code to build one that just tells us.
+This one is for my own house. My wife and I always find it difficult to find time to sit down and create a grocery shopping list, and are juggling a potentially a few different diet restrictions at the same time. Every shared grocery list app we tried made us stop and think, "wait, can we all actually eat this?" So I worked with Claude Code to build one that just tells us.
 
-You pick your household's diet restrictions (dairy-free, gluten-free, vegan, low-carb, or modified AIP) and every item on the list gets color coded green or red based on whether it fits. No more guessing in the store.
+You pick your household's diet restrictions (dairy-free, gluten-free, vegan, low-carb, or modified AIP) and every item on the list gets color coded green or red based on whether it fits. No more guessing in the store. You can also add a food from the catalog search function and edit any dietary restriction tags on any food.
 
 ## How to use the application
 
