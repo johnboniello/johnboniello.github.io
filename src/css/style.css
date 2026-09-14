@@ -177,8 +177,9 @@ h1, h2, h3 { line-height: 1.2; font-weight: 700; font-family: var(--font-serif);
 .card__image {
   display: block;
   width: calc(100% + 3rem);
+  max-width: calc(100% + 3rem);
   margin: 0 -1.5rem 1rem;
-  aspect-ratio: 3 / 1;
+  aspect-ratio: 960 / 350;
   object-fit: cover;
 }
 
