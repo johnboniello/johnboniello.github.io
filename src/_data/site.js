@@ -13,8 +13,16 @@ module.exports = {
     { text: "Consulting", url: "/consulting/" },
     { text: "Dictée FR", url: "/projects/dictee-fr/"},
     { text: "Conjugaison FR", url: "/projects/conjugaison-fr/"},
+    { text: "Family Cookbook", url: "/projects/family-cookbook/"},
   ],
   projects: [
+    {
+      title: "Family Cookbook",
+      description:
+        "A shared family recipe app — everyone gets their own section, scan handwritten recipe cards or import from a URL, scale servings automatically, and copy recipes between family members. Works as a web app or an Android app.",
+      url: "/projects/family-cookbook/",
+      cta: "Learn more",
+    },
     {
       title: "Behavior Referral Tracker",
       description:
