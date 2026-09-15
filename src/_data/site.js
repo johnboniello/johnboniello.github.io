@@ -2,40 +2,53 @@ module.exports = {
   title: "John Boniello",
   tagline: "Helping Educators with the Difficult Stuff",
   description:
-    "Practical tools, research summaries, and (soon) consulting for teachers of students with disabilities and English Language Learners.",
+    "Practical tools and research summaries for teachers of students with disabilities and English Language Learners.",
   url: "https://johnboniello.com",
   author: "John Boniello",
   nav: [
-    { text: "Home", url: "/" },
-    { text: "Posts", url: "/posts/" },
+    { text: "Writing", url: "/posts/" },
     { text: "Projects", url: "/#projects" },
     { text: "Photography", url: "/photography/" },
-    { text: "Consulting", url: "/consulting/" },
-    { text: "Dictée FR", url: "/projects/dictee-fr/"},
-    { text: "Conjugaison FR", url: "/projects/conjugaison-fr/"},
-    { text: "Family Cookbook", url: "/projects/family-cookbook/"},
   ],
   projects: [
     {
       title: "Family Cookbook",
       description:
-        "A shared family recipe app — everyone gets their own section, scan handwritten recipe cards or import from a URL, scale servings automatically, and copy recipes between family members. Works as a web app or an Android app.",
+        "A shared family recipe app — scan handwritten recipe cards, import from a URL, and scale servings automatically.",
       url: "/projects/family-cookbook/",
-      cta: "Learn more",
+      cta: "Explore",
+      image: "/images/projects/family-cookbook.svg",
     },
     {
       title: "Behavior Referral Tracker",
       description:
-        "A free, role-based referral and case-management system for schools — submit, assign, and close referrals with a built-in analytics dashboard, running entirely inside your district's own Google Workspace.",
+        "Role-based referral and case management for schools, running entirely inside your district's Google Workspace.",
       url: "https://johnboniello.com/Behavior-Tracker",
-      cta: "Learn more",
+      cta: "Explore",
     },
     {
-      title: "Research Roundup",
+      title: "Grocery List",
       description:
-        "Semi-regular summaries of education research and reading — not always peer-reviewed, always aimed at what actually helps in the classroom.",
-      url: "/research-roundup/",
-      cta: "Read the roundups",
+        "A shared household grocery list app that flags items against your diet restrictions as you shop.",
+      url: "/projects/grocery-list/",
+      cta: "Explore",
+      image: "/images/projects/grocery-list.svg",
+    },
+    {
+      title: "Dictée FR",
+      description:
+        "A French dictée practice app, built as an installable PWA for daily practice.",
+      url: "/projects/dictee-fr/",
+      cta: "Explore",
+      image: "/images/projects/dictee.png",
+    },
+    {
+      title: "Conjugaison FR",
+      description:
+        "A companion PWA for practicing French verb conjugation, covering 261 verbs.",
+      url: "/projects/conjugaison-fr/",
+      cta: "Explore",
+      image: "/images/projects/conjugaison.png",
     },
   ],
   social: [

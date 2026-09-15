@@ -10,6 +10,9 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/dictee");
   // Conjugaison FR — self-contained PWA, copied verbatim to /conjugaison/
   eleventyConfig.addPassthroughCopy("src/conjugaison");
+  // Grocery List — Vite/React build output, built with `npm run build:web`
+  // in the app's own repo and copied verbatim to /grocery/.
+  eleventyConfig.addPassthroughCopy("src/grocery");
 
   // Watch CSS for live-reload while running `npm start`
   eleventyConfig.addWatchTarget("src/css/");

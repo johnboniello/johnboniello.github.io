@@ -1,0 +1,12 @@
+<svg width="960" height="350" viewBox="0 0 960 350" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="350" fill="#fffbeb"/>
+  <text x="32" y="72" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#92400e">Family Cookbook</text>
+
+  <circle cx="480" cy="165" r="82" fill="#ffffff" stroke="#b45309" stroke-width="4"/>
+  <g transform="translate(480 165)" fill="none" stroke="#92400e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 0 -38 C -14 -48 -36 -50 -50 -46 L -50 40 C -36 36 -14 38 0 48 C 14 38 36 36 50 40 L 50 -46 C 36 -50 14 -48 0 -38 Z" fill="#fef3c7"/>
+    <path d="M 0 -38 L 0 48" />
+  </g>
+
+  <text x="480" y="300" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#92400e" text-anchor="middle">Family Cookbook</text>
+</svg>
