@@ -1,0 +1,13 @@
+<svg width="960" height="350" viewBox="0 0 960 350" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="350" fill="#e3f0fb"/>
+  <text x="32" y="72" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#1c4d78">Dictée FR</text>
+
+  <circle cx="480" cy="165" r="82" fill="#ffffff" stroke="#1c4d78" stroke-width="4"/>
+  <g transform="translate(480 165) rotate(-45)" fill="none" stroke="#1c4d78" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M -11 -50 L -11 30 L 0 46 L 11 30 L 11 -50 Z" fill="#e3f0fb"/>
+    <path d="M -11 -50 L 0 -68 L 11 -50" fill="#e3f0fb"/>
+    <line x1="-11" y1="-38" x2="11" y2="-38"/>
+  </g>
+
+  <text x="480" y="300" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#1c4d78" text-anchor="middle">Dictée FR</text>
+</svg>
