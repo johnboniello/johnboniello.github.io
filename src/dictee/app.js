@@ -38,6 +38,28 @@
     },
     wordsUpdatedAt() { const r = parseInt(localStorage.getItem("df_words_at"), 10); return isFinite(r) ? r : 0; },
     wordsReplacedAt() { const r = parseInt(localStorage.getItem("df_words_replaced_at"), 10); return isFinite(r) ? r : 0; },
+    // A word removed one at a time (not via "Nouvelle semaine") is remembered
+    // here so a sync can't resurrect it from another device's older copy of
+    // the list — a plain word union has no way to represent a removal.
+    deletedWords() {
+      try { const r = JSON.parse(localStorage.getItem("df_deleted")); return Array.isArray(r) ? r : []; }
+      catch { return []; }
+    },
+    saveDeletedWords(a) { try { localStorage.setItem("df_deleted", JSON.stringify(a)); } catch {} },
+    /** Remember a single word removed via "Supprimer" so sync won't bring it back. */
+    markDeleted(word) {
+      const cur = this.deletedWords();
+      if (!cur.some((w) => w.toLowerCase() === word.toLowerCase())) { cur.push(word); this.saveDeletedWords(cur); }
+    },
+    /** A re-added word is no longer considered deleted. */
+    unmarkDeleted(word) {
+      const cur = this.deletedWords();
+      const next = cur.filter((w) => w.toLowerCase() !== word.toLowerCase());
+      if (next.length !== cur.length) this.saveDeletedWords(next);
+    },
+    /** "Nouvelle semaine" declares a fresh, authoritative list: old tombstones no longer apply. */
+    clearDeletedWords() { this.saveDeletedWords([]); },
+    saveDeletedWordsFromSync(a) { this.saveDeletedWords(a); },
     familyCode() { return localStorage.getItem("df_code") || ""; },
     setFamilyCode(c) { try { localStorage.setItem("df_code", c); } catch {} },
     rate() { const r = parseFloat(localStorage.getItem("df_rate")); return isFinite(r) ? r : 0.9; },
@@ -993,6 +1015,7 @@
           const cur = store.words();
           cur.splice(idx, 1);
           store.saveWords(cur);
+          store.markDeleted(w);
           render();
         });
         box.appendChild(makeRow(w, [pin, del]));
@@ -1030,6 +1053,7 @@
       if (replace) {
         if (!window.confirm(`Remplacer la liste par ces ${parts.length} mots ?\n\nLes « Mots à revoir » sont gardés.`)) return;
         stats.prune();
+        store.clearDeletedWords();
         const uniq = [];
         const seen = new Set();
         for (const p of parts) { const k = p.toLowerCase(); if (!seen.has(k)) { seen.add(k); uniq.push(p); } }
@@ -1040,7 +1064,10 @@
       } else {
         const cur = store.words();
         let added = 0;
-        for (const p of parts) if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+        for (const p of parts) {
+          if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+          store.unmarkDeleted(p);
+        }
         store.saveWords(cur);
         $("#wordInput").value = "";
         render();
@@ -1109,26 +1136,35 @@
     async function syncList(code, now) {
       const local = store.words();
       const localRep = store.wordsReplacedAt();
+      const localDeleted = store.deletedWords();
       const remote = await pull("list", code);
       if (remote.empty || !Array.isArray(remote.words)) {
-        await push("list", code, { words: local, updatedAt: now, replacedAt: localRep });
+        await push("list", code, { words: local, deleted: localDeleted, updatedAt: now, replacedAt: localRep });
         return `envoyé ${local.length} mot(s)`;
       }
+      const remoteWords = remote.words;
+      const remoteDeleted = Array.isArray(remote.deleted) ? remote.deleted : [];
       const remoteRep = remote.replacedAt || 0;
-      let merged, replacedAt, adopted = false;
-      if (remoteRep > localRep) {            // other device started a new week
-        merged = remote.words.slice();
+      let merged, mergedDeleted, replacedAt, adopted = false;
+      if (remoteRep > localRep) {            // other device started a new week: adopt it whole
+        merged = remoteWords.slice();
+        mergedDeleted = remoteDeleted.slice();
         replacedAt = remoteRep;
         adopted = true;
-      } else if (localRep > remoteRep) {     // this device started a new week
+      } else if (localRep > remoteRep) {     // this device started a new week: its list wins
         merged = local.slice();
+        mergedDeleted = localDeleted.slice();
         replacedAt = localRep;
-      } else {                               // same generation -> union
-        merged = mergeLists(local, remote.words);
+      } else {                               // same generation -> union, minus anything either
+                                              // device has explicitly deleted since
+        mergedDeleted = mergeLists(localDeleted, remoteDeleted);
+        const deletedKeys = new Set(mergedDeleted.map((w) => w.toLowerCase()));
+        merged = mergeLists(local, remoteWords).filter((w) => !deletedKeys.has(w.toLowerCase()));
         replacedAt = localRep;
       }
       store.saveWordsFromSync(merged, now, replacedAt);
-      await push("list", code, { words: merged, updatedAt: now, replacedAt });
+      store.saveDeletedWordsFromSync(mergedDeleted);
+      await push("list", code, { words: merged, deleted: mergedDeleted, updatedAt: now, replacedAt });
       if (adopted) return `nouvelle liste : ${merged.length} mot(s)`;
       const received = merged.filter((w) => !local.some((x) => x.toLowerCase() === w.toLowerCase())).length;
       return received > 0 ? `${merged.length} mot(s) (+${received} reçu(s))` : `${merged.length} mot(s)`;
