@@ -6,7 +6,7 @@ module.exports = {
   url: "https://johnboniello.com",
   author: "John Boniello",
   nav: [
-    { text: "Writing", url: "/posts/" },
+    { text: "Writing", url: "/writing/" },
     { text: "Projects", url: "/#projects" },
     { text: "Photography", url: "/photography/" },
   ],
@@ -23,7 +23,7 @@ module.exports = {
       title: "Behavior Referral Tracker",
       description:
         "Role-based referral and case management for schools, running entirely inside your district's Google Workspace.",
-      url: "https://johnboniello.com/Behavior-Tracker",
+      url: "/projects/behavior-tracker/",
       cta: "Explore",
     },
     {

@@ -5,7 +5,7 @@ Jekyll/Minimal Mistakes setup.
 
 ## Posting something new
 
-1. Add a new file in `src/posts/`, named like `src/posts/my-post-title.md`.
+1. Add a new file in `src/writing/`, named like `src/writing/my-post-title.md`.
 2. Give it this front matter at the top:
 
    ```markdown
