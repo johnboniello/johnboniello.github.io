@@ -17,9 +17,9 @@ module.exports = function (eleventyConfig) {
   // Watch CSS for live-reload while running `npm start`
   eleventyConfig.addWatchTarget("src/css/");
 
-  // Posts collection: everything in src/posts/, newest first
+  // Posts collection: everything in src/writing/, newest first
   eleventyConfig.addCollection("posts", (collectionApi) => {
-    return collectionApi.getFilteredByGlob("src/posts/*.md").sort((a, b) => {
+    return collectionApi.getFilteredByGlob("src/writing/*.md").sort((a, b) => {
       return b.date - a.date;
     });
   });
