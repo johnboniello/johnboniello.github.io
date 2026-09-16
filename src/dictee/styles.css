@@ -63,6 +63,24 @@ html, body {
 
 section[data-view][hidden] { display: none; }
 
+.ptr-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  transform: translateY(calc(0px - 100%));
+  background: var(--tri-blue-pale);
+  color: var(--tri-blue-pale-on);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 12px;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  pointer-events: none;
+}
+.ptr-indicator.settling { transition: transform .18s ease; }
+
 button, .btn {
   font: inherit;
   color: var(--tri-blue-on);

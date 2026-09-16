@@ -59,6 +59,8 @@
       } catch {}
     },
     statsUpdatedAt() { const r = parseInt(localStorage.getItem("df_stats_at"), 10); return isFinite(r) ? r : 0; },
+    lastSyncedAt() { const r = parseInt(localStorage.getItem("df_last_synced_at"), 10); return isFinite(r) ? r : 0; },
+    markSyncedNow() { try { localStorage.setItem("df_last_synced_at", String(Date.now())); } catch {} },
   };
 
   /* ---------------- practice stats ("Mots à revoir") ---------------- */
@@ -1145,25 +1147,53 @@
       return null;
     }
 
+    let syncing = false;
+    const AUTO_MIN_INTERVAL_MS = 20000;
+
+    /** Runs one sync pass. [silent] suppresses the button/status UI — used by
+     *  auto-sync and pull-to-refresh, which have their own indicators. */
+    async function doSync(code, silent) {
+      if (syncing) return { ok: false };
+      syncing = true;
+      if (!silent) { $("#syncBtn").disabled = true; setStatus("Synchronisation…"); }
+      try {
+        const now = Date.now();
+        const listText = await syncList(code, now);
+        const statsNote = await syncStats(code, now);
+        store.markSyncedNow();
+        words.render();
+        words.renderReview();
+        if (!$("#home").hidden) refreshHome();
+        if (!silent) setStatus(`À jour : ${listText}.` + (statsNote ? " " + statsNote : ""));
+        return { ok: true };
+      } catch (e) {
+        if (!silent) setStatus("Échec : " + (e && e.message ? e.message : "réseau"));
+        return { ok: false, error: e };
+      } finally {
+        syncing = false;
+        if (!silent) $("#syncBtn").disabled = false;
+      }
+    }
+
     async function run() {
       const code = norm($("#codeInput").value);
       if (!valid(code)) { setStatus("Code invalide : 8 à 40 lettres, chiffres ou tirets."); return; }
       $("#codeInput").value = code;
       store.setFamilyCode(code);
-      $("#syncBtn").disabled = true;
-      setStatus("Synchronisation…");
-      try {
-        const now = Date.now();
-        const listText = await syncList(code, now);
-        const statsNote = await syncStats(code, now);
-        words.render();
-        words.renderReview();
-        setStatus(`À jour : ${listText}.` + (statsNote ? " " + statsNote : ""));
-      } catch (e) {
-        setStatus("Échec : " + (e && e.message ? e.message : "réseau"));
-      } finally {
-        $("#syncBtn").disabled = false;
-      }
+      await doSync(code, false);
+    }
+
+    /**
+     * Sync triggered by app-open/tab-visible or pull-to-refresh rather than a
+     * button tap: no-ops if syncing isn't configured, no family code has been
+     * saved yet, or — for the passive case — we already synced recently. Pass
+     * { force: true } to bypass that cooldown, e.g. for pull-to-refresh.
+     */
+    async function autoSync({ force = false } = {}) {
+      const code = store.familyCode();
+      if (!configured || !valid(code)) return { ok: false };
+      if (!force && Date.now() - store.lastSyncedAt() < AUTO_MIN_INTERVAL_MS) return { ok: false };
+      return doSync(code, true);
     }
 
     function init() {
@@ -1183,12 +1213,61 @@
         catch { setStatus("Code : " + code); }
       });
       $("#syncBtn").addEventListener("click", run);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") autoSync();
+      });
     }
 
     // Re-fill the code field whenever the words view opens.
     function refresh() { if (configured) $("#codeInput").value = store.familyCode(); }
 
-    return { init, refresh };
+    return { init, refresh, autoSync };
+  })();
+
+  /* ================= PULL TO REFRESH ================= */
+  (() => {
+    const PULL_MAX = 80;
+    const PULL_TRIGGER = 60;
+    const el = document.createElement("div");
+    el.className = "ptr-indicator";
+    el.textContent = "↓ Tirer pour synchroniser";
+    document.body.insertBefore(el, document.body.firstChild);
+
+    let startY = 0, dragging = false, armed = false;
+    const setPull = (px) => { el.style.transform = `translateY(calc(${px}px - 100%))`; };
+
+    document.addEventListener("touchstart", (e) => {
+      dragging = document.scrollingElement.scrollTop <= 0 && e.touches.length === 1;
+      startY = dragging ? e.touches[0].clientY : 0;
+      armed = false;
+      el.classList.remove("settling");
+    }, { passive: true });
+
+    document.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy <= 0) { setPull(0); return; }
+      e.preventDefault();
+      const pull = Math.min(dy * 0.5, PULL_MAX);
+      armed = pull >= PULL_TRIGGER;
+      el.textContent = armed ? "↑ Relâche pour synchroniser" : "↓ Tirer pour synchroniser";
+      setPull(pull);
+    }, { passive: false });
+
+    function release() {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.add("settling");
+      if (!armed) { setPull(0); return; }
+      el.textContent = "🔄 Synchronisation…";
+      setPull(PULL_TRIGGER);
+      sync.autoSync({ force: true }).finally(() => {
+        setPull(0);
+        el.textContent = "↓ Tirer pour synchroniser";
+      });
+    }
+    document.addEventListener("touchend", release);
+    document.addEventListener("touchcancel", release);
   })();
 
   /* ================= SCAN (OCR) ================= */
@@ -1269,6 +1348,7 @@
   /* ---------------- boot ---------------- */
   sync.init();
   show("home");
+  sync.autoSync();
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
   }
