@@ -38,6 +38,28 @@
     },
     wordsUpdatedAt() { const r = parseInt(localStorage.getItem("df_words_at"), 10); return isFinite(r) ? r : 0; },
     wordsReplacedAt() { const r = parseInt(localStorage.getItem("df_words_replaced_at"), 10); return isFinite(r) ? r : 0; },
+    // A word removed one at a time (not via "Nouvelle semaine") is remembered
+    // here so a sync can't resurrect it from another device's older copy of
+    // the list — a plain word union has no way to represent a removal.
+    deletedWords() {
+      try { const r = JSON.parse(localStorage.getItem("df_deleted")); return Array.isArray(r) ? r : []; }
+      catch { return []; }
+    },
+    saveDeletedWords(a) { try { localStorage.setItem("df_deleted", JSON.stringify(a)); } catch {} },
+    /** Remember a single word removed via "Supprimer" so sync won't bring it back. */
+    markDeleted(word) {
+      const cur = this.deletedWords();
+      if (!cur.some((w) => w.toLowerCase() === word.toLowerCase())) { cur.push(word); this.saveDeletedWords(cur); }
+    },
+    /** A re-added word is no longer considered deleted. */
+    unmarkDeleted(word) {
+      const cur = this.deletedWords();
+      const next = cur.filter((w) => w.toLowerCase() !== word.toLowerCase());
+      if (next.length !== cur.length) this.saveDeletedWords(next);
+    },
+    /** "Nouvelle semaine" declares a fresh, authoritative list: old tombstones no longer apply. */
+    clearDeletedWords() { this.saveDeletedWords([]); },
+    saveDeletedWordsFromSync(a) { this.saveDeletedWords(a); },
     familyCode() { return localStorage.getItem("df_code") || ""; },
     setFamilyCode(c) { try { localStorage.setItem("df_code", c); } catch {} },
     rate() { const r = parseFloat(localStorage.getItem("df_rate")); return isFinite(r) ? r : 0.9; },
@@ -59,6 +81,8 @@
       } catch {}
     },
     statsUpdatedAt() { const r = parseInt(localStorage.getItem("df_stats_at"), 10); return isFinite(r) ? r : 0; },
+    lastSyncedAt() { const r = parseInt(localStorage.getItem("df_last_synced_at"), 10); return isFinite(r) ? r : 0; },
+    markSyncedNow() { try { localStorage.setItem("df_last_synced_at", String(Date.now())); } catch {} },
   };
 
   /* ---------------- practice stats ("Mots à revoir") ---------------- */
@@ -991,6 +1015,7 @@
           const cur = store.words();
           cur.splice(idx, 1);
           store.saveWords(cur);
+          store.markDeleted(w);
           render();
         });
         box.appendChild(makeRow(w, [pin, del]));
@@ -1028,6 +1053,7 @@
       if (replace) {
         if (!window.confirm(`Remplacer la liste par ces ${parts.length} mots ?\n\nLes « Mots à revoir » sont gardés.`)) return;
         stats.prune();
+        store.clearDeletedWords();
         const uniq = [];
         const seen = new Set();
         for (const p of parts) { const k = p.toLowerCase(); if (!seen.has(k)) { seen.add(k); uniq.push(p); } }
@@ -1038,7 +1064,10 @@
       } else {
         const cur = store.words();
         let added = 0;
-        for (const p of parts) if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+        for (const p of parts) {
+          if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+          store.unmarkDeleted(p);
+        }
         store.saveWords(cur);
         $("#wordInput").value = "";
         render();
@@ -1107,26 +1136,35 @@
     async function syncList(code, now) {
       const local = store.words();
       const localRep = store.wordsReplacedAt();
+      const localDeleted = store.deletedWords();
       const remote = await pull("list", code);
       if (remote.empty || !Array.isArray(remote.words)) {
-        await push("list", code, { words: local, updatedAt: now, replacedAt: localRep });
+        await push("list", code, { words: local, deleted: localDeleted, updatedAt: now, replacedAt: localRep });
         return `envoyé ${local.length} mot(s)`;
       }
+      const remoteWords = remote.words;
+      const remoteDeleted = Array.isArray(remote.deleted) ? remote.deleted : [];
       const remoteRep = remote.replacedAt || 0;
-      let merged, replacedAt, adopted = false;
-      if (remoteRep > localRep) {            // other device started a new week
-        merged = remote.words.slice();
+      let merged, mergedDeleted, replacedAt, adopted = false;
+      if (remoteRep > localRep) {            // other device started a new week: adopt it whole
+        merged = remoteWords.slice();
+        mergedDeleted = remoteDeleted.slice();
         replacedAt = remoteRep;
         adopted = true;
-      } else if (localRep > remoteRep) {     // this device started a new week
+      } else if (localRep > remoteRep) {     // this device started a new week: its list wins
         merged = local.slice();
+        mergedDeleted = localDeleted.slice();
         replacedAt = localRep;
-      } else {                               // same generation -> union
-        merged = mergeLists(local, remote.words);
+      } else {                               // same generation -> union, minus anything either
+                                              // device has explicitly deleted since
+        mergedDeleted = mergeLists(localDeleted, remoteDeleted);
+        const deletedKeys = new Set(mergedDeleted.map((w) => w.toLowerCase()));
+        merged = mergeLists(local, remoteWords).filter((w) => !deletedKeys.has(w.toLowerCase()));
         replacedAt = localRep;
       }
       store.saveWordsFromSync(merged, now, replacedAt);
-      await push("list", code, { words: merged, updatedAt: now, replacedAt });
+      store.saveDeletedWordsFromSync(mergedDeleted);
+      await push("list", code, { words: merged, deleted: mergedDeleted, updatedAt: now, replacedAt });
       if (adopted) return `nouvelle liste : ${merged.length} mot(s)`;
       const received = merged.filter((w) => !local.some((x) => x.toLowerCase() === w.toLowerCase())).length;
       return received > 0 ? `${merged.length} mot(s) (+${received} reçu(s))` : `${merged.length} mot(s)`;
@@ -1145,25 +1183,53 @@
       return null;
     }
 
+    let syncing = false;
+    const AUTO_MIN_INTERVAL_MS = 20000;
+
+    /** Runs one sync pass. [silent] suppresses the button/status UI — used by
+     *  auto-sync and pull-to-refresh, which have their own indicators. */
+    async function doSync(code, silent) {
+      if (syncing) return { ok: false };
+      syncing = true;
+      if (!silent) { $("#syncBtn").disabled = true; setStatus("Synchronisation…"); }
+      try {
+        const now = Date.now();
+        const listText = await syncList(code, now);
+        const statsNote = await syncStats(code, now);
+        store.markSyncedNow();
+        words.render();
+        words.renderReview();
+        if (!$("#home").hidden) refreshHome();
+        if (!silent) setStatus(`À jour : ${listText}.` + (statsNote ? " " + statsNote : ""));
+        return { ok: true };
+      } catch (e) {
+        if (!silent) setStatus("Échec : " + (e && e.message ? e.message : "réseau"));
+        return { ok: false, error: e };
+      } finally {
+        syncing = false;
+        if (!silent) $("#syncBtn").disabled = false;
+      }
+    }
+
     async function run() {
       const code = norm($("#codeInput").value);
       if (!valid(code)) { setStatus("Code invalide : 8 à 40 lettres, chiffres ou tirets."); return; }
       $("#codeInput").value = code;
       store.setFamilyCode(code);
-      $("#syncBtn").disabled = true;
-      setStatus("Synchronisation…");
-      try {
-        const now = Date.now();
-        const listText = await syncList(code, now);
-        const statsNote = await syncStats(code, now);
-        words.render();
-        words.renderReview();
-        setStatus(`À jour : ${listText}.` + (statsNote ? " " + statsNote : ""));
-      } catch (e) {
-        setStatus("Échec : " + (e && e.message ? e.message : "réseau"));
-      } finally {
-        $("#syncBtn").disabled = false;
-      }
+      await doSync(code, false);
+    }
+
+    /**
+     * Sync triggered by app-open/tab-visible or pull-to-refresh rather than a
+     * button tap: no-ops if syncing isn't configured, no family code has been
+     * saved yet, or — for the passive case — we already synced recently. Pass
+     * { force: true } to bypass that cooldown, e.g. for pull-to-refresh.
+     */
+    async function autoSync({ force = false } = {}) {
+      const code = store.familyCode();
+      if (!configured || !valid(code)) return { ok: false };
+      if (!force && Date.now() - store.lastSyncedAt() < AUTO_MIN_INTERVAL_MS) return { ok: false };
+      return doSync(code, true);
     }
 
     function init() {
@@ -1183,12 +1249,61 @@
         catch { setStatus("Code : " + code); }
       });
       $("#syncBtn").addEventListener("click", run);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") autoSync();
+      });
     }
 
     // Re-fill the code field whenever the words view opens.
     function refresh() { if (configured) $("#codeInput").value = store.familyCode(); }
 
-    return { init, refresh };
+    return { init, refresh, autoSync };
+  })();
+
+  /* ================= PULL TO REFRESH ================= */
+  (() => {
+    const PULL_MAX = 80;
+    const PULL_TRIGGER = 60;
+    const el = document.createElement("div");
+    el.className = "ptr-indicator";
+    el.textContent = "↓ Tirer pour synchroniser";
+    document.body.insertBefore(el, document.body.firstChild);
+
+    let startY = 0, dragging = false, armed = false;
+    const setPull = (px) => { el.style.transform = `translateY(calc(${px}px - 100%))`; };
+
+    document.addEventListener("touchstart", (e) => {
+      dragging = document.scrollingElement.scrollTop <= 0 && e.touches.length === 1;
+      startY = dragging ? e.touches[0].clientY : 0;
+      armed = false;
+      el.classList.remove("settling");
+    }, { passive: true });
+
+    document.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy <= 0) { setPull(0); return; }
+      e.preventDefault();
+      const pull = Math.min(dy * 0.5, PULL_MAX);
+      armed = pull >= PULL_TRIGGER;
+      el.textContent = armed ? "↑ Relâche pour synchroniser" : "↓ Tirer pour synchroniser";
+      setPull(pull);
+    }, { passive: false });
+
+    function release() {
+      if (!dragging) return;
+      dragging = false;
+      el.classList.add("settling");
+      if (!armed) { setPull(0); return; }
+      el.textContent = "🔄 Synchronisation…";
+      setPull(PULL_TRIGGER);
+      sync.autoSync({ force: true }).finally(() => {
+        setPull(0);
+        el.textContent = "↓ Tirer pour synchroniser";
+      });
+    }
+    document.addEventListener("touchend", release);
+    document.addEventListener("touchcancel", release);
   })();
 
   /* ================= SCAN (OCR) ================= */
@@ -1269,6 +1384,7 @@
   /* ---------------- boot ---------------- */
   sync.init();
   show("home");
+  sync.autoSync();
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
   }
