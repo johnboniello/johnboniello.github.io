@@ -40,7 +40,7 @@ module.exports = {
         "A French dictée practice app, built as an installable PWA for daily practice.",
       url: "/projects/dictee-fr/",
       cta: "Explore",
-      image: "/images/projects/dictee.png",
+      image: "/images/projects/dictee.svg",
     },
     {
       title: "Conjugaison FR",
@@ -48,7 +48,7 @@ module.exports = {
         "A companion PWA for practicing French verb conjugation, covering 261 verbs.",
       url: "/projects/conjugaison-fr/",
       cta: "Explore",
-      image: "/images/projects/conjugaison.png",
+      image: "/images/projects/conjugaison.svg",
     },
   ],
   social: [

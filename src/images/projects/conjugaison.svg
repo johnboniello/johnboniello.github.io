@@ -1,0 +1,15 @@
+<svg width="960" height="350" viewBox="0 0 960 350" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="350" fill="#ede8fa"/>
+  <text x="32" y="72" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#4a3480">Conjugaison FR</text>
+
+  <circle cx="480" cy="165" r="82" fill="#ffffff" stroke="#4a3480" stroke-width="4"/>
+  <g transform="translate(480 165)" fill="none" stroke="#4a3480" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M -35 -55 L 20 -55 L 35 -40 L 35 55 L -35 55 Z" fill="#ede8fa"/>
+    <path d="M 20 -55 L 20 -40 L 35 -40" />
+    <line x1="-20" y1="-15" x2="20" y2="-15" />
+    <line x1="-20" y1="5" x2="20" y2="5" />
+    <line x1="-20" y1="25" x2="10" y2="25" />
+  </g>
+
+  <text x="480" y="300" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#4a3480" text-anchor="middle">Conjugaison FR</text>
+</svg>
