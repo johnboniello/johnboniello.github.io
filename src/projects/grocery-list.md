@@ -31,6 +31,12 @@ This is only available for Android right now. When you download it, you will nee
 
 Contact me if you get stuck.
 
+### Updating from an older version
+
+If you installed the Android app before version 1.4.0, you will need to uninstall it before installing the newest version. I changed the key the app is signed with, and Android will not install an update signed with a different key over the old one. Version 1.4.0 and newer update normally.
+
+Uninstalling also removes that phone from your household, because the app signs in anonymously and only remembers you on the phone itself. Your lists are safe, but the phone will need a new invite code to rejoin. Before you uninstall, make sure another device in your household is still signed in (the web app works well for this) so it can generate the code. Please do not uninstall on every device at the same time, or no one will be able to create a code.
+
 - [Open the web app](/grocery/)
 - [Source on GitHub](https://github.com/johnboniello/Grocery-list-app)
 - [Download the Android APK](https://github.com/johnboniello/Grocery-list-app/releases/latest/download/app-release.apk)
