@@ -13,8 +13,6 @@ especially teachers working with students with disabilities and English Language
 [Research Roundup](https://johnboniello.com/Research-round-up/) are both still around and linked
 from the homepage.
 
-New: I'm also starting to put together special education **consulting** services. That page is
-still a placeholder for now, but it'll fill in over the coming weeks.
+I have also started to build some little apps, mostly for use in my home with my daughter or wife. I thought it would be good to release them for anyone to use. 
 
-*(This post is a placeholder written during the rebuild — edit or replace it with your own words
-whenever you're ready.)*
+As I work on new write-ups they will be posted on this site. 
