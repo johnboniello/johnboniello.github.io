@@ -1,6 +1,6 @@
 module.exports = {
   title: "John Boniello",
-  tagline: "Helping Educators with the Difficult Stuff",
+  tagline: "Educator · Researcher · Builder",
   description:
     "Practical tools and research summaries for teachers of students with disabilities and English Language Learners.",
   url: "https://johnboniello.com",

@@ -1,17 +1,17 @@
 /* ---------- Design tokens ---------- */
 :root {
-  --color-bg: oklch(98% 0.006 88);
+  --color-bg: oklch(98% 0.007 81);
   --color-surface: oklch(100% 0 0);
-  --color-text: oklch(23% 0.02 262);
-  --color-text-muted: oklch(46% 0.02 262);
-  --color-border: oklch(90% 0.012 262);
-  --color-primary: oklch(27% 0.05 262);
-  --color-primary-dark: oklch(17% 0.04 262);
-  --color-accent: oklch(52% 0.11 76);
-  --color-accent-soft: oklch(95% 0.025 78);
-  --font-sans: "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+  --color-text: oklch(28% 0.019 202);
+  --color-text-muted: oklch(52% 0.018 202);
+  --color-border: oklch(90% 0.021 82);
+  --color-primary: oklch(47% 0.074 208);
+  --color-primary-dark: oklch(38% 0.059 209);
+  --color-accent: oklch(56% 0.076 65);
+  --color-accent-soft: oklch(92% 0.028 74);
+  --font-sans: "Archivo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
   --measure: 42rem;
   --radius: 10px;
   --shadow: 0 1px 2px rgba(20, 20, 20, 0.04), 0 4px 16px rgba(20, 20, 20, 0.06);
@@ -19,15 +19,15 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: oklch(20% 0.01 262);
-    --color-surface: oklch(25% 0.014 262);
-    --color-text: oklch(92% 0.006 262);
-    --color-text-muted: oklch(68% 0.014 262);
-    --color-border: oklch(33% 0.016 262);
-    --color-primary: oklch(72% 0.09 262);
-    --color-primary-dark: oklch(82% 0.07 262);
-    --color-accent: oklch(78% 0.1 78);
-    --color-accent-soft: oklch(32% 0.04 78);
+    --color-bg: oklch(22% 0.022 191);
+    --color-surface: oklch(29% 0.032 192);
+    --color-text: oklch(96% 0.004 180);
+    --color-text-muted: oklch(77% 0.017 192);
+    --color-border: oklch(35% 0.034 190);
+    --color-primary: oklch(73% 0.086 190);
+    --color-primary-dark: oklch(81% 0.067 189);
+    --color-accent: oklch(78% 0.095 67);
+    --color-accent-soft: oklch(31% 0.031 66);
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.4);
   }
 }
@@ -46,7 +46,7 @@ body {
 img { max-width: 100%; display: block; }
 a { color: var(--color-primary-dark); text-decoration-thickness: 1.5px; text-underline-offset: 2px; }
 a:hover { color: var(--color-accent); }
-h1, h2, h3 { line-height: 1.2; font-weight: 700; font-family: var(--font-serif); }
+h1, h2, h3 { line-height: 1.2; font-weight: 500; font-style: italic; font-family: var(--font-serif); }
 .wrap { max-width: 64rem; margin: 0 auto; padding: 0 1.5rem; }
 .section { padding: 3rem 1.5rem; }
 .muted { color: var(--color-text-muted); }
@@ -79,7 +79,7 @@ h1, h2, h3 { line-height: 1.2; font-weight: 700; font-family: var(--font-serif);
   text-decoration: none;
   line-height: 1.25;
 }
-.site-header__name { font-weight: 700; font-size: 1.15rem; font-family: var(--font-serif); }
+.site-header__name { font-weight: 500; font-style: italic; font-size: 1.15rem; font-family: var(--font-serif); }
 .site-header__tagline { font-size: 0.85rem; color: var(--color-text-muted); }
 
 .site-nav__toggle {
@@ -232,6 +232,16 @@ h1, h2, h3 { line-height: 1.2; font-weight: 700; font-family: var(--font-serif);
 /* ---------- Post / prose ---------- */
 .prose { max-width: var(--measure); }
 .prose p, .prose ul, .prose ol { max-width: var(--measure); }
+.prose h2, .prose h3 { font-style: normal; font-weight: 600; }
+.prose blockquote {
+  margin: 2rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 3px solid var(--color-primary);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--color-text);
+}
 .post__back { margin-bottom: 0.5rem; }
 .post__back a { text-decoration: none; font-weight: 600; font-size: 0.9rem; }
 .post__header { margin-bottom: 1.5rem; }
