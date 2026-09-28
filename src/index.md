@@ -16,7 +16,10 @@ description: Notes on what works in special education and English Language Learn
 <section class="wrap section writing-promo">
   <div class="section__heading-row">
     <h2>Latest writing</h2>
-    <a href="/writing/">All posts &rarr;</a>
+    <div class="heading-links">
+      <a href="/feed.xml" class="muted-link">Subscribe (RSS)</a>
+      <a href="/writing/">All posts &rarr;</a>
+    </div>
   </div>
   {% if collections.posts.length %}
   <div class="writing-grid">

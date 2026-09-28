@@ -1,6 +1,9 @@
 const { DateTime } = require("luxon");
+const { rssPlugin } = require("@11ty/eleventy-plugin-rss");
 
 module.exports = function (eleventyConfig) {
+  eleventyConfig.addPlugin(rssPlugin);
+
   // Static passthroughs
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/images");
