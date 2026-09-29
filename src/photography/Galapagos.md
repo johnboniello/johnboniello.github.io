@@ -2,7 +2,7 @@
 layout: photo-collection.njk
 title: Galapagos
 date: 2024-04-15
-cover: 
+cover: Galapagos/park sign.jpg
 description: Some of my favorite shots from the Galapagos Islands.
 photos:
   - src: Galapagos/park sign.jpg

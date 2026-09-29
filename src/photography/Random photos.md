@@ -2,7 +2,7 @@
 layout: photo-collection.njk
 title: Random shots
 date: 2025-07-04
-cover: 
+cover: Random/iris.jpg
 description: A mix of favorite shots that do not fit anywhere else.
 photos:
   - src: Random/cuomo sharpened.jpg
