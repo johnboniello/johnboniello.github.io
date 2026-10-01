@@ -1149,10 +1149,13 @@
     function setStatus(t) { $("#syncStatus").textContent = t; }
 
     async function syncList(code, now) {
+      const remote = await pull("list", code);
+      // Read local state only after the request: nothing can run between
+      // these reads and the save below, so a word added while the request
+      // was in flight can no longer be overwritten by an older snapshot.
       const local = store.words();
       const localRep = store.wordsReplacedAt();
       const localDeleted = store.deletedWords();
-      const remote = await pull("list", code);
       if (remote.empty || !Array.isArray(remote.words)) {
         await push("list", code, { words: local, deleted: localDeleted, updatedAt: now, replacedAt: localRep });
         return `envoyé ${local.length} mot(s)`;
@@ -1186,10 +1189,10 @@
     }
 
     async function syncStats(code, now) {
-      const local = store.stats();
       let remote;
       try { remote = await pull("stats", code); }
       catch { return "stats non synchronisées (serveur à mettre à jour)"; }
+      const local = store.stats(); // read after the request, as in syncList
       const remoteStats = (remote && !remote.empty && remote.stats && typeof remote.stats === "object") ? remote.stats : {};
       const merged = stats.mergeInto(local, remoteStats);
       store.saveStatsFromSync(merged, now);

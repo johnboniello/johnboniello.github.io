@@ -68,8 +68,10 @@
     setRate(r) { try { localStorage.setItem("cf_rate", String(r)); } catch {} },
     active() {
       try {
+        // Missing = never chosen -> the core list. An empty array is a real
+        // choice ("Aucun") and must stay empty.
         const a = JSON.parse(localStorage.getItem("cf_verbs"));
-        if (Array.isArray(a) && a.length) return a;
+        if (Array.isArray(a)) return a;
       } catch {}
       return CORE.slice();
     },
@@ -194,13 +196,17 @@
     const tail = OBJ[ch.inf] || "";
     let s;
     if (ch.tense === "impe") {
-      s = frame.replace("{b}", BLANK).replace("{t}", tail);
+      // "s'il te plaît" only fits a tu command.
+      const f = ch.pIdx === 1 ? frame : frame.replace("s'il te plaît", "s'il vous plaît");
+      s = f.replace("{b}", BLANK).replace("{t}", tail);
     } else {
       let subj;
       if (ch.pIdx === 0) subj = /^[aàâäeéèêëiîïoôöuùûüyh]/i.test(ch.answer) ? "j’" : "je";
       else subj = PERSON[ch.pIdx];
       s = frame.replace("{s}", subj).replace("{b}", BLANK).replace("{t}", tail);
       s = s.replace("j’ " + BLANK, "j’" + BLANK);
+      // "que il" -> "qu’il" (subjonctif frames, "Bien que ...").
+      s = s.replace(/\bque (ils?|elles?|on)\b/gi, "qu’$1");
     }
     return s.replace(/\s+([.!?,])/g, "$1").replace(/\s{2,}/g, " ").trim();
   }
