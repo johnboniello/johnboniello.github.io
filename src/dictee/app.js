@@ -187,9 +187,17 @@
         const r = (remote && remote[k]) || null;
         if (l && !r) { out[k] = l; continue; }
         if (r && !l) { out[k] = r; continue; }
+        // The side with the more recent miss decides the box: a miss resets it
+        // to 1, and taking the max would let the other device's older,
+        // higher box silently erase that miss. Same last miss -> keep the
+        // higher box (progress or "mastered" made after that shared miss).
+        const lMiss = l.lastMissAt || 0, rMiss = r.lastMissAt || 0;
+        const box = lMiss > rMiss ? (l.box || 1)
+          : rMiss > lMiss ? (r.box || 1)
+          : Math.max(l.box || 1, r.box || 1);
         out[k] = {
           text: (l.text && l.text.length >= (r.text || "").length) ? l.text : (r.text || l.text),
-          box: Math.max(l.box || 1, r.box || 1),
+          box,
           seen: Math.max(l.seen || 0, r.seen || 0),
           miss: Math.max(l.miss || 0, r.miss || 0),
           lastMissAt: Math.max(l.lastMissAt || 0, r.lastMissAt || 0),
@@ -1380,7 +1388,12 @@
       if (!parts.length) { say("Rien à ajouter"); return; }
       const cur = store.words();
       let added = 0;
-      for (const p of parts) if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+      for (const p of parts) {
+        if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }
+        // A re-scanned word that was deleted earlier must lose its tombstone,
+        // or the next sync's merge filters it right back out.
+        store.unmarkDeleted(p);
+      }
       store.saveWords(cur);
       status(added ? added + " mot(s) ajouté(s)." : "Ces mots sont déjà dans la liste.");
     });
