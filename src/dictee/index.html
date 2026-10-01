@@ -67,6 +67,7 @@
     <p class="muted" id="scrEmpty" hidden>Ajoute d'abord des mots (« Gérer les mots »).</p>
     <div id="scrControls" class="btn-row">
       <button id="scrListen">🔊 Écouter</button>
+      <button id="scrSlow" class="ghost">🐢 Lent</button>
       <button id="scrHint">💡 Indice</button>
       <button id="scrSpell">🔊 Épeler</button>
     </div>
@@ -82,7 +83,10 @@
   <section data-view="choice" id="choice">
     <p class="progress" id="choiceProgress"></p>
     <p class="muted" id="choiceEmpty" hidden>Ajoute d'abord des mots (« Gérer les mots »).</p>
-    <button class="wide big" id="choiceListen">🔊 Écouter le mot</button>
+    <div class="btn-row listen-row" id="choiceListenRow">
+      <button class="big" id="choiceListen">🔊 Écouter le mot</button>
+      <button class="big ghost" id="choiceSlow">🐢 Lent</button>
+    </div>
     <p class="label" id="choiceInstruction">Choisis la bonne orthographe :</p>
     <button class="opt" data-opt="0"></button>
     <button class="opt" data-opt="1"></button>
@@ -97,7 +101,10 @@
     <p class="progress" id="dictProgress"></p>
     <p class="muted" id="dictEmpty" hidden>Ajoute d'abord des mots (« Gérer les mots »).</p>
     <div id="dictBody">
-      <button class="wide big" id="dictListen">🔊 Écouter le mot</button>
+      <div class="btn-row listen-row">
+        <button class="big" id="dictListen">🔊 Écouter le mot</button>
+        <button class="big ghost" id="dictSlow">🐢 Lent</button>
+      </div>
       <button class="wide mt-sm" id="dictRepeat">🔁 Réécouter</button>
       <div class="btn-row mt-sm">
         <button id="dictHint">💡 Indice</button>

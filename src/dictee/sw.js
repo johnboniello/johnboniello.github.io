@@ -1,5 +1,5 @@
 /* Dictée FR service worker — offline app shell + runtime caching. */
-const CACHE = "dictee-fr-v13";
+const CACHE = "dictee-fr-v14";
 const SHELL = [
   "./",
   "./index.html",

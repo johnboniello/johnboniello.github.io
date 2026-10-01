@@ -236,6 +236,10 @@
       speechSynthesis.speak(u);
     } catch {}
   }
+  /* Says the word once at half the current speed, without changing the saved rate. */
+  function saySlow(word) {
+    if (word) say(word, { rate: Math.max(0.3, store.rate() * 0.5) });
+  }
   function sayQueue(parts, rate) {
     if (!canSpeak) return;
     try {
@@ -753,6 +757,7 @@
     }
 
     $("#scrListen").addEventListener("click", () => say(curWord()));
+    $("#scrSlow").addEventListener("click", () => saySlow(curWord()));
     $("#scrHint").addEventListener("click", hint);
     $("#scrSpell").addEventListener("click", () => spellSlowly(curWord()));
     $("#scrNext").addEventListener("click", next);
@@ -774,7 +779,7 @@
       const empty = list.length === 0;
       $("#choiceEmpty").textContent = emptyMsg();
       $("#choiceEmpty").hidden = !empty;
-      $("#choiceListen").hidden = empty;
+      $("#choiceListenRow").hidden = empty;
       $("#choiceInstruction").hidden = empty;
       opts.forEach((o) => (o.hidden = empty));
       $("#choiceNext").hidden = true;
@@ -841,6 +846,7 @@
 
     opts.forEach((b, i) => b.addEventListener("click", () => pick(i)));
     $("#choiceListen").addEventListener("click", () => say(curWord()));
+    $("#choiceSlow").addEventListener("click", () => saySlow(curWord()));
     $("#choiceNext").addEventListener("click", next);
 
     return { start };
@@ -972,6 +978,7 @@
 
     $("#dictListen").addEventListener("click", () => say(curWord()));
     $("#dictRepeat").addEventListener("click", () => say(curWord()));
+    $("#dictSlow").addEventListener("click", () => saySlow(curWord()));
     $("#dictHint").addEventListener("click", revealHint);
     $("#dictSpell").addEventListener("click", () => spellSlowly(curWord()));
     $("#dictBack").addEventListener("click", () => { guess = guess.slice(0, -1); refreshGuess(); });

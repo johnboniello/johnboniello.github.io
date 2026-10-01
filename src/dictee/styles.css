@@ -103,6 +103,8 @@ button:disabled { opacity: 0.55; }
 /* Rows of buttons: equal width AND equal height. */
 .btn-row { display: flex; gap: 8px; align-items: stretch; }
 .btn-row > button { flex: 1 1 0; min-width: 0; }
+/* Listen + slow: listen gets two thirds of the row. */
+.listen-row > button:first-child { flex-grow: 2; }
 
 .big { font-size: 18px; min-height: 54px; }
 .wide { display: flex; width: 100%; }
