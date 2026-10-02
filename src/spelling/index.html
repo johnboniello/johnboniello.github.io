@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Spelling EN</title>
+  <meta name="description" content="Practice English spelling words.">
+  <meta name="theme-color" content="#1565c0">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Spelling EN">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div id="app">
+
+  <div class="topbar">
+    <button id="backBtn" hidden aria-label="Back">←</button>
+    <h1 id="topTitle">Spelling EN</h1>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <section data-view="home" id="home">
+    <div class="mascot-wrap">
+      <span class="mascot-ring"><img src="./icons/mascot.png" alt="Mascot: the owl"></span>
+    </div>
+    <div class="home-title">Spelling</div>
+    <p class="muted center">Pick a game.</p>
+    <div class="menu">
+      <button class="big m-blue" data-go="scramble">🔤&nbsp; Scrambled Letters</button>
+      <button class="big m-red" data-go="choice">🎯&nbsp; Pick the Spelling</button>
+      <button class="big m-gold" data-go="dictee">✏️&nbsp; Write the Word</button>
+    </div>
+    <button class="big m-review mt" id="reviewBtn" hidden></button>
+    <div id="reviewChooser" class="menu" hidden>
+      <p class="label center">How do you want to review?</p>
+      <button class="ghost" data-review="scramble">🔤&nbsp; Scrambled Letters</button>
+      <button class="ghost mt-sm" data-review="choice">🎯&nbsp; Pick the Spelling</button>
+      <button class="ghost mt-sm" data-review="dictee">✏️&nbsp; Write the Word</button>
+      <button class="ghost mt-sm" id="reviewCancel">Cancel</button>
+    </div>
+    <hr class="hr">
+    <div class="menu">
+      <button class="ghost" data-go="words">📚&nbsp; Manage Words</button>
+      <button class="ghost red mt-sm" data-go="scan">📷&nbsp; Scan a List (photo)</button>
+    </div>
+    <div class="settings-row">
+      <label for="rate" class="muted">Voice speed</label>
+      <select id="rate">
+        <option value="0.5">Very slow</option>
+        <option value="0.7">Slow</option>
+        <option value="0.9">Normal</option>
+        <option value="1.1">A bit fast</option>
+        <option value="1.3">Fast</option>
+      </select>
+    </div>
+    <p class="muted mt" id="wordCount"></p>
+    <p class="muted" id="installHint" hidden>Tip: add the app to your home screen (Share menu → “Add to Home Screen”).</p>
+  </section>
+
+  <!-- ================= SCRAMBLE ================= -->
+  <section data-view="scramble" id="scramble">
+    <p class="progress" id="scrProgress"></p>
+    <p class="muted" id="scrEmpty" hidden>Add some words first (“Manage Words”).</p>
+    <div id="scrControls" class="btn-row">
+      <button id="scrListen">🔊 Listen</button>
+      <button id="scrSlow" class="ghost">🐢 Slow</button>
+      <button id="scrHint">💡 Hint</button>
+      <button id="scrSpell">🔊 Spell</button>
+    </div>
+    <div id="board">
+      <div id="slots"></div>
+      <div id="tray"></div>
+    </div>
+    <p class="feedback" id="scrFeedback"></p>
+    <button class="wide" id="scrNext" hidden>➡️ Next word</button>
+  </section>
+
+  <!-- ================= CHOICE ================= -->
+  <section data-view="choice" id="choice">
+    <p class="progress" id="choiceProgress"></p>
+    <p class="muted" id="choiceEmpty" hidden>Add some words first (“Manage Words”).</p>
+    <div class="btn-row listen-row" id="choiceListenRow">
+      <button class="big" id="choiceListen">🔊 Hear the word</button>
+      <button class="big ghost" id="choiceSlow">🐢 Slow</button>
+    </div>
+    <p class="label" id="choiceInstruction">Pick the right spelling:</p>
+    <button class="opt" data-opt="0"></button>
+    <button class="opt" data-opt="1"></button>
+    <button class="opt" data-opt="2"></button>
+    <button class="opt" data-opt="3"></button>
+    <p class="feedback" id="choiceFeedback"></p>
+    <button class="wide" id="choiceNext" hidden>➡️ Next word</button>
+  </section>
+
+  <!-- ================= WRITE THE WORD ================= -->
+  <section data-view="dictee" id="dictee">
+    <p class="progress" id="dictProgress"></p>
+    <p class="muted" id="dictEmpty" hidden>Add some words first (“Manage Words”).</p>
+    <div id="dictBody">
+      <div class="btn-row listen-row">
+        <button class="big" id="dictListen">🔊 Hear the word</button>
+        <button class="big ghost" id="dictSlow">🐢 Slow</button>
+      </div>
+      <button class="wide mt-sm" id="dictRepeat">🔁 Hear it again</button>
+      <div class="btn-row mt-sm">
+        <button id="dictHint">💡 Hint</button>
+        <button id="dictSpell">🔊 Spell it slowly</button>
+      </div>
+      <hr class="hr">
+      <p class="muted">✏️ Write the word on your paper, then type the letters:</p>
+      <p class="hint" id="dictHintLine" hidden></p>
+      <p class="guess" id="dictGuess">— — —</p>
+      <div id="keyboard"></div>
+      <div class="btn-row mt-sm">
+        <button id="dictBack">⌫ One letter</button>
+        <button id="dictClear">Clear all</button>
+      </div>
+      <button class="wide big mt-sm" id="dictCheck">✅ Check</button>
+
+      <div class="card" id="dictResult" hidden>
+        <div class="answer-row" id="dictAnswerRow">
+          <div class="cap">Right answer:</div>
+          <div class="word" id="dictTarget"></div>
+        </div>
+        <div class="cap">Your answer:</div>
+        <div class="word" id="dictYours"></div>
+        <div class="summary" id="dictSummary"></div>
+        <div class="btn-row">
+          <button id="dictHear">🔊 Listen</button>
+          <button id="dictRetry">↺ Try again</button>
+          <button id="dictReveal" hidden>👁 Answer</button>
+          <button id="dictNext">➡️ Next</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORDS ================= -->
+  <section data-view="words" id="words">
+    <p class="muted">Add this week's words — one per line, or paste a list separated by commas.</p>
+    <textarea id="wordInput" placeholder="because, friend, Wednesday"></textarea>
+    <div class="btn-row mt-sm">
+      <button id="wordAdd">➕ Add</button>
+      <button class="ghost" id="wordReplace">🗓️ New week</button>
+    </div>
+
+    <div class="review-card" id="reviewSection" hidden>
+      <h3 id="reviewTitle">🔁 Words to review</h3>
+      <p class="muted">Words she misses come back here until she gets them right a few times.</p>
+      <div class="wordlist" id="reviewList"></div>
+      <button class="ghost mt-sm" id="reviewClean">🧹 Remove mastered words</button>
+    </div>
+
+    <div class="sync-card" id="syncCard" hidden>
+      <h3>🔗 Share the list between devices</h3>
+      <p class="muted">Make a code, then enter the same code on the other device and tap Sync.</p>
+      <input type="text" id="codeInput" placeholder="family code" autocomplete="off" autocapitalize="none" spellcheck="false">
+      <div class="btn-row mt-sm">
+        <button class="ghost" id="genCodeBtn">🎲 Generate</button>
+        <button class="ghost" id="copyCodeBtn">📋 Copy</button>
+      </div>
+      <button class="wide mt-sm" id="syncBtn">🔄 Sync now</button>
+      <p class="muted" id="syncStatus"></p>
+    </div>
+
+    <hr class="hr">
+    <p class="progress" id="wordCountList">0 words</p>
+    <div class="wordlist" id="wordList"></div>
+  </section>
+
+  <!-- ================= SCAN ================= -->
+  <section data-view="scan" id="scan">
+    <p class="muted">Take a photo of the word list — it works best with one word per line, flat and well lit.</p>
+    <label class="btn big wide" for="scanFile">📷 Take a photo</label>
+    <input type="file" id="scanFile" accept="image/*" capture="environment">
+    <p class="muted mt" id="scanStatus">The words it finds will show up here so you can check them.</p>
+    <textarea id="scanReview" placeholder="one word per line"></textarea>
+    <button class="wide mt-sm" id="scanAdd">Add to the list</button>
+  </section>
+
+</div>
+<script src="./app.js"></script>
+</body>
+</html>

@@ -12,6 +12,8 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy("src/feed.xsl");
   // Dictée FR — self-contained PWA, copied verbatim to /dictee/
   eleventyConfig.addPassthroughCopy("src/dictee");
+  // Spelling EN — English port of Dictée FR, copied verbatim to /spelling/
+  eleventyConfig.addPassthroughCopy("src/spelling");
   // Conjugaison FR — self-contained PWA, copied verbatim to /conjugaison/
   eleventyConfig.addPassthroughCopy("src/conjugaison");
   // Grocery List — Vite/React build output, built with `npm run build:web`

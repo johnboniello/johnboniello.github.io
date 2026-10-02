@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install Spelling EN</title>
+  <meta name="theme-color" content="#1565c0">
+  <link rel="stylesheet" href="./styles.css">
+  <style>
+    #app { max-width: 620px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; margin-top: 28px; }
+    ol { padding-left: 20px; }
+    li { margin: 8px 0; }
+    .dl {
+      display: inline-block; background: var(--blue); color: #fff;
+      text-decoration: none; padding: 14px 20px; border-radius: 12px; font-size: 18px; margin: 6px 0;
+    }
+    .note { background: #eef2f7; border-radius: 10px; padding: 12px 14px; color: var(--blue-dark); }
+    a { color: var(--blue); }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar"><h1>Install “Spelling EN”</h1></div>
+
+  <h2>On iPhone / iPad — nothing to install</h2>
+  <p>Open <a href="./">the web app</a> in Safari, then <strong>Share → “Add to Home Screen”</strong>. After that it opens like a real app, and works offline.</p>
+
+  <h2>On Android — install the app</h2>
+  <p><a class="dl" id="apk" href="https://github.com/johnboniello/english-spelling/releases/latest/download/spelling-en.apk">⬇️ Download spelling-en.apk</a></p>
+  <p class="muted">Android 8.0 or newer · ~26 MB</p>
+  <ol>
+    <li>On the phone, tap the download button above.</li>
+    <li>Open the file <code>spelling-en.apk</code> (from the notifications or the “Files” app).</li>
+    <li>Android says “For your security…”. Tap <strong>Settings</strong>, turn on
+      <strong>“Allow from this source”</strong>, go back, then tap <strong>Install</strong>.</li>
+    <li>If a Play Protect “unverified app” warning appears, choose
+      <strong>“Install anyway”</strong> — that's normal for an app that isn't from the Play Store.</li>
+    <li>Open <strong>Spelling EN</strong>. The first time you use the camera, allow access.</li>
+  </ol>
+
+  <div class="note">
+    The web app and the Android app are the same. On Android, scanning a word list from a photo
+    happens on the phone, offline; the web version can scan too, but more slowly.
+  </div>
+
+  <h2>Share the list between devices</h2>
+  <p>In <strong>“Manage Words”</strong>, a <strong>family code</strong> keeps the same list
+    (and the “Words to review”) on several phones or tablets.</p>
+  <ol>
+    <li>On the first device: <strong>🎲 Generate</strong>, then <strong>📤 Send</strong>
+      (or <strong>📋 Copy</strong>) to pass the code to the other device.</li>
+    <li>On the other device: enter the same code and tap <strong>🔄 Sync</strong>.
+      The two lists merge (nothing is lost).</li>
+    <li>After that, the lists sync by themselves whenever the app opens, or pull down to sync.</li>
+  </ol>
+  <p class="muted">The code looks like <code>owl-blue-h7k2m9</code>: two words followed by
+    6 random characters. Anyone who knows the code can see and change that list — keep it in
+    the family. English and French lists are kept apart, even if you use the same code in
+    Dictée FR.</p>
+
+  <p style="margin-top:28px"><a href="./">← Open the web app</a></p>
+</div>
+</body>
+</html>

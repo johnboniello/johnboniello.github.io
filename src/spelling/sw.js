@@ -1,5 +1,5 @@
-/* Conjugaison FR service worker — offline app shell + runtime caching. */
-const CACHE = "conjugaison-fr-v7";
+/* Spelling EN service worker — offline app shell + runtime caching. */
+const CACHE = "spelling-en-v1";
 const SHELL = [
   "./",
   "./index.html",
@@ -8,24 +8,28 @@ const SHELL = [
   "./manifest.webmanifest",
   "./install.html",
   "./privacy.html",
-  "./verbs.json",
   "./sfx/correct.wav",
   "./sfx/wrong.wav",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/icon-512-maskable.png",
-  "./icons/apple-touch-icon.png"
+  "./icons/apple-touch-icon.png",
+  "./icons/mascot.png",
+  "./fonts/Andika-Regular.woff2",
+  "./fonts/Andika-Bold.woff2"
 ];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(
+    caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys()
       // Only this app's old caches: the other apps on this origin share Cache Storage.
-      .then((keys) => Promise.all(keys.filter((k) => k.startsWith("conjugaison-fr-") && k !== CACHE).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith("spelling-en-") && k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
@@ -33,11 +37,16 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
+
+  // App navigations: serve the cached shell when offline.
   if (req.mode === "navigate") {
     e.respondWith(fetch(req).catch(() => caches.match("./index.html")));
     return;
   }
-  const url = new URL(req.url);
+
+  // Same-origin: cache-first, then fill the cache. Cross-origin (Tesseract CDN,
+  // its language data): just go to network and let the browser HTTP cache handle it.
   if (url.origin === self.location.origin) {
     e.respondWith(
       caches.match(req).then((hit) =>
