@@ -1,0 +1,18 @@
+<svg width="960" height="350" viewBox="0 0 960 350" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="350" fill="#fbefdc"/>
+  <text x="32" y="72" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#8a4a12">Spelling EN</text>
+
+  <circle cx="480" cy="165" r="82" fill="#ffffff" stroke="#8a4a12" stroke-width="4"/>
+  <g fill="#fbefdc" stroke="#8a4a12" stroke-width="6" stroke-linejoin="round">
+    <rect x="412" y="138" width="44" height="52" rx="9" transform="rotate(-10 434 164)"/>
+    <rect x="458" y="132" width="44" height="52" rx="9"/>
+    <rect x="504" y="138" width="44" height="52" rx="9" transform="rotate(10 526 164)"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="32" font-weight="800" fill="#8a4a12" text-anchor="middle">
+    <text x="434" y="176" transform="rotate(-10 434 164)">A</text>
+    <text x="480" y="170">B</text>
+    <text x="526" y="176" transform="rotate(10 526 164)">C</text>
+  </g>
+
+  <text x="480" y="300" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#8a4a12" text-anchor="middle">Spelling EN</text>
+</svg>

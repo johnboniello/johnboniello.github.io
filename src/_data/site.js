@@ -50,6 +50,14 @@ module.exports = {
       cta: "Explore",
       image: "/images/projects/conjugaison.svg",
     },
+    {
+      title: "Spelling EN",
+      description:
+        "The English version of Dictée FR, for practicing weekly English spelling words.",
+      url: "/projects/spelling-en/",
+      cta: "Explore",
+      image: "/images/projects/spelling.svg",
+    },
   ],
   social: [
     { text: "Twitter / X", url: "https://twitter.com/johnboniello", icon: "twitter" },
