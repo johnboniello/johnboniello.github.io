@@ -13,8 +13,9 @@ This is the English version of my [French Dictée app](/projects/dictee-fr/). My
 ## How to use the application
 
 - [Open the web app here](/spelling/)
+- [Download the Android APK here](https://github.com/johnboniello/english-spelling/releases/latest/download/spelling-en.apk)
 
-On an iPhone or iPad, open it in Safari and choose Share → "Add to Home Screen". On Android, open it in Chrome and choose "Install app". After that it opens like a regular app and works offline.
+On an iPhone or iPad, open it in Safari and choose Share → "Add to Home Screen". On Android, open it in Chrome and choose "Install app". After that it opens like a regular app and works offline. The Android APK is ***only*** for Android, and you will need to allow installing unknown apps; the [installation page](/spelling/install.html) walks through it.
 
 ### Adding and Removing Words
 
@@ -41,6 +42,8 @@ For more information, see the [installation page](/spelling/install.html).
 I hope your child (or you) enjoy!
 
 - [Open the web app](/spelling/)
+- [Source on GitHub](https://github.com/johnboniello/english-spelling)
+- [Download the Android APK](https://github.com/johnboniello/english-spelling/releases/latest/download/spelling-en.apk)
 - [French version: Dictée FR](/projects/dictee-fr/)
 
 </section>
