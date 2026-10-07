@@ -58,6 +58,22 @@ module.exports = {
       cta: "Explore",
       image: "/images/projects/spelling.svg",
     },
+    {
+      title: "Times-Table Quest",
+      description:
+        "A multiplication role-playing game for kids, where every attack is a times-table problem. Nothing is timed.",
+      url: "/projects/times-table-quest/",
+      cta: "Explore",
+      image: "/images/projects/times-table-quest.png",
+    },
+    {
+      title: "Abandon All Hope",
+      description:
+        "A comedy point-and-click adventure through Dante's nine circles of Hell, with a Family and a Grown-up edition.",
+      url: "/projects/abandon-all-hope/",
+      cta: "Explore",
+      image: "/images/projects/abandon-all-hope.png",
+    },
   ],
   social: [
     { text: "Twitter / X", url: "https://twitter.com/johnboniello", icon: "twitter" },
