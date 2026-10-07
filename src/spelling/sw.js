@@ -1,5 +1,5 @@
 /* Spelling EN service worker — offline app shell + runtime caching. */
-const CACHE = "spelling-en-v2";
+const CACHE = "spelling-en-v3";
 const SHELL = [
   "./",
   "./index.html",
