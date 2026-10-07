@@ -41,6 +41,12 @@
     // A word removed one at a time (not via "Nouvelle semaine") is remembered
     // here so a sync can't resurrect it from another device's older copy of
     // the list — a plain word union has no way to represent a removal.
+    //
+    // Tombstones alone can't represent putting a word *back*: the server keeps
+    // its copy, so a re-added word would be deleted again on the next sync.
+    // So each device also journals what it deleted and re-added since its last
+    // successful sync; sync applies the journal on top of the server's
+    // tombstones and clears it once the server has the result.
     deletedWords() {
       try { const r = JSON.parse(localStorage.getItem("df_deleted")); return Array.isArray(r) ? r : []; }
       catch { return []; }
@@ -50,15 +56,42 @@
     markDeleted(word) {
       const cur = this.deletedWords();
       if (!cur.some((w) => w.toLowerCase() === word.toLowerCase())) { cur.push(word); this.saveDeletedWords(cur); }
+      this._journal("df_pending_undeleted", null, word);
+      this._journal("df_pending_deleted", word, null);
     },
-    /** A re-added word is no longer considered deleted. */
+    /** A word typed or scanned in is no longer considered deleted — here, and
+     *  (via the journal) on the server and the other devices at the next sync. */
     unmarkDeleted(word) {
       const cur = this.deletedWords();
       const next = cur.filter((w) => w.toLowerCase() !== word.toLowerCase());
       if (next.length !== cur.length) this.saveDeletedWords(next);
+      this._journal("df_pending_deleted", null, word);
+      this._journal("df_pending_undeleted", word, null);
     },
     /** "Nouvelle semaine" declares a fresh, authoritative list: old tombstones no longer apply. */
-    clearDeletedWords() { this.saveDeletedWords([]); },
+    clearDeletedWords() { this.saveDeletedWords([]); this._writeList("df_pending_deleted", []); this._writeList("df_pending_undeleted", []); },
+    /** Words deleted / re-added here since the last successful sync. Before the
+     *  first sync with this version there's no journal: the local tombstones
+     *  themselves are the pending deletes (the old behaviour). */
+    pendingDeleted() { return this._readList("df_pending_deleted") || this.deletedWords(); },
+    pendingUndeleted() { return this._readList("df_pending_undeleted") || []; },
+    /** The server now holds these changes: drop them from the journal. */
+    clearJournal(syncedDeleted, syncedUndeleted) {
+      const has = (arr, w) => arr.some((x) => x.toLowerCase() === w.toLowerCase());
+      this._writeList("df_pending_deleted", this.pendingDeleted().filter((w) => !has(syncedDeleted, w)));
+      this._writeList("df_pending_undeleted", this.pendingUndeleted().filter((w) => !has(syncedUndeleted, w)));
+    },
+    _journal(key, add, remove) {
+      let cur = this._readList(key) || (key === "df_pending_deleted" ? this.deletedWords() : []);
+      if (remove) cur = cur.filter((w) => w.toLowerCase() !== remove.toLowerCase());
+      if (add && !cur.some((w) => w.toLowerCase() === add.toLowerCase())) cur.push(add);
+      this._writeList(key, cur);
+    },
+    _readList(key) {
+      try { const r = JSON.parse(localStorage.getItem(key)); return Array.isArray(r) ? r : null; }
+      catch { return null; }
+    },
+    _writeList(key, a) { try { localStorage.setItem(key, JSON.stringify(a)); } catch {} },
     saveDeletedWordsFromSync(a) { this.saveDeletedWords(a); },
     familyCode() { return localStorage.getItem("df_code") || ""; },
     setFamilyCode(c) { try { localStorage.setItem("df_code", c); } catch {} },
@@ -583,6 +616,7 @@
     }
 
     function round() {
+      clearTimeout(checkTimer);
       cleanupOrphans();
       solved = false; hinted = false; wrongThisWord = false;
       $("#scrFeedback").textContent = "";
@@ -691,17 +725,23 @@
 
     function clearInline(t) { t.removeAttribute("style"); }
     function returnToTray(t) { clearInline(t); trayEl().appendChild(t); }
+    // One pending "is the board right?" check, so quick moves don't queue several.
+    let checkTimer = 0;
+    function scheduleCheck() { clearTimeout(checkTimer); checkTimer = setTimeout(check, 700); }
     function placeInSlot(tile, slot) {
       clearInline(tile);
       slot.appendChild(tile);
       const k = +slot.dataset.slot;
       const full = allFilled();
       announce(k);
-      if (full) setTimeout(check, 700);
+      if (full) scheduleCheck();
     }
 
     function check() {
-      if (solved) return;
+      // Runs 0.7 s after the last slot fills. If she has picked a tile back up
+      // since, the word isn't finished: judging it now would say "Pas tout à
+      // fait" and record a miss she never made.
+      if (solved || !allFilled()) return;
       const slots = slotEls();
       const right = slotChars.every((c, i) => {
         const t = tileIn(slots[i]);
@@ -752,7 +792,7 @@
       hinted = true;
       const full = allFilled();
       announce(k);
-      if (full) setTimeout(check, 700);
+      if (full) scheduleCheck();
     }
 
     function next() {
@@ -1018,7 +1058,7 @@
       $("#wordCountList").textContent = list.length === 1 ? "1 mot" : list.length + " mot" + (list.length ? "s" : "s");
       const box = $("#wordList");
       box.innerHTML = "";
-      list.forEach((w, idx) => {
+      list.forEach((w) => {
         const pin = document.createElement("button");
         pin.className = "iconbtn" + (stats.isPinned(w) ? " on" : "");
         pin.title = "Toujours réviser ce mot";
@@ -1026,10 +1066,10 @@
         pin.addEventListener("click", () => { stats.setPinned(w, !stats.isPinned(w)); render(); renderReview(); });
         const del = document.createElement("button");
         del.textContent = "Supprimer";
+        // By word, not by the row's index: a sync may have saved a different
+        // list since this one was drawn, and the index would hit another word.
         del.addEventListener("click", () => {
-          const cur = store.words();
-          cur.splice(idx, 1);
-          store.saveWords(cur);
+          store.saveWords(store.words().filter((x) => x.toLowerCase() !== w.toLowerCase()));
           store.markDeleted(w);
           render();
         });
@@ -1156,8 +1196,11 @@
       const local = store.words();
       const localRep = store.wordsReplacedAt();
       const localDeleted = store.deletedWords();
+      const pendingDel = store.pendingDeleted();
+      const pendingUndel = store.pendingUndeleted();
       if (remote.empty || !Array.isArray(remote.words)) {
         await push("list", code, { words: local, deleted: localDeleted, updatedAt: now, replacedAt: localRep });
+        store.clearJournal(pendingDel, pendingUndel);
         return `envoyé ${local.length} mot(s)`;
       }
       const remoteWords = remote.words;
@@ -1173,9 +1216,13 @@
         merged = local.slice();
         mergedDeleted = localDeleted.slice();
         replacedAt = localRep;
-      } else {                               // same generation -> union, minus anything either
-                                              // device has explicitly deleted since
-        mergedDeleted = mergeLists(localDeleted, remoteDeleted);
+      } else {                               // same generation -> union, minus what's deleted.
+        // The server's tombstones are the shared truth; on top of them go the
+        // deletes made here since the last sync, and out come the words
+        // re-added here. A stale local tombstone no longer counts, so a word
+        // re-added on any device stays added everywhere.
+        const undeleted = new Set(pendingUndel.map((w) => w.toLowerCase()));
+        mergedDeleted = mergeLists(remoteDeleted.filter((w) => !undeleted.has(w.toLowerCase())), pendingDel);
         const deletedKeys = new Set(mergedDeleted.map((w) => w.toLowerCase()));
         merged = mergeLists(local, remoteWords).filter((w) => !deletedKeys.has(w.toLowerCase()));
         replacedAt = localRep;
@@ -1183,6 +1230,9 @@
       store.saveWordsFromSync(merged, now, replacedAt);
       store.saveDeletedWordsFromSync(mergedDeleted);
       await push("list", code, { words: merged, deleted: mergedDeleted, updatedAt: now, replacedAt });
+      // The server has it now. (Adopting another device's new week also
+      // retires this device's journal: those edits were to last week's list.)
+      store.clearJournal(pendingDel, pendingUndel);
       if (adopted) return `nouvelle liste : ${merged.length} mot(s)`;
       const received = merged.filter((w) => !local.some((x) => x.toLowerCase() === w.toLowerCase())).length;
       return received > 0 ? `${merged.length} mot(s) (+${received} reçu(s))` : `${merged.length} mot(s)`;
@@ -1328,9 +1378,20 @@
   const scan = (() => {
     function start() {
       $("#scanReview").value = "";
+      updateCount();
       $("#scanStatus").textContent = "Les mots trouvés apparaîtront ici pour que tu les vérifies.";
     }
     function status(t) { $("#scanStatus").textContent = t; }
+    const uniqWords = (arr) => {
+      const seen = new Set();
+      return arr.map((s) => s.trim()).filter((s) => s && !seen.has(s.toLowerCase()) && seen.add(s.toLowerCase()));
+    };
+    const fieldWords = () => uniqWords($("#scanReview").value.split("\n"));
+    function updateCount() {
+      const n = fieldWords().length;
+      $("#scanCount").textContent = n === 0 ? "" : n === 1 ? "1 mot" : n + " mots";
+    }
+    $("#scanReview").addEventListener("input", updateCount);
 
     async function ensureTesseract() {
       if (window.Tesseract) return;
@@ -1351,7 +1412,11 @@
         line = line.replace(/^\s*(\d+\s*[.)\-–]|[-*•·–])\s*/, "");
         for (let part of line.split(/[,;/|]|\s{2,}|\s-\s/)) {
           part = part.trim().replace(/^[.,;:"'()!?·–_-]+|[.,;:"'()!?·–_-]+$/g, "");
-          if (part.length >= 1 && part.length <= 30 && /\p{L}/u.test(part) && !/\d/.test(part)) out.push(part);
+          // A lone letter is almost always a list number OCR misread ("1." -> "l");
+          // more than three words is a sentence or a heading, not a spelling word.
+          const lone = part.length === 1 && !/^[aàyAÀY]$/.test(part);
+          const sentence = part.split(/\s+/).length > 3;
+          if (part.length >= 1 && part.length <= 30 && /\p{L}/u.test(part) && !/\d/.test(part) && !lone && !sentence) out.push(part);
         }
       }
       return [...new Set(out.map((w) => w))];
@@ -1372,10 +1437,14 @@
           status("Aucun mot reconnu. Réessaie avec plus de lumière, le texte bien à plat.");
           return;
         }
-        const existing = $("#scanReview").value.trim();
-        const merged = [...new Set(((existing ? existing.split("\n") : []).concat(found)).map((s) => s.trim()).filter(Boolean))];
-        $("#scanReview").value = merged.join("\n");
-        status("Vérifie et corrige, puis « Ajouter à la liste ».");
+        // A second photo (a retake, or page two) shouldn't silently pile onto
+        // the first one's words.
+        const existing = fieldWords();
+        const keep = existing.length > 0 && window.confirm(
+          `${found.length} mots trouvés. Il y a déjà ${existing.length} mots scannés.\n\nOK = garder les deux (deuxième page)\nAnnuler = les remplacer (nouvelle photo)`);
+        $("#scanReview").value = uniqWords((keep ? existing : []).concat(found)).join("\n");
+        updateCount();
+        status("Vérifie et corrige, puis « Nouvelle semaine ».");
       } catch (e) {
         status("Lecture impossible : " + (e && e.message ? e.message : "erreur") + ". Tu peux taper les mots à la main.");
       }
@@ -1386,10 +1455,25 @@
       if (f) run(f);
       e.target.value = "";
     });
+    $("#scanReplace").addEventListener("click", () => {
+      const parts = fieldWords();
+      if (!parts.length) { say("Rien à ajouter"); return; }
+      if (!window.confirm(`Remplacer la liste par ces ${parts.length} mots ?\n\nLes « Mots à revoir » sont gardés.`)) return;
+      stats.prune();
+      store.clearDeletedWords();
+      store.replaceWords(parts);
+      status(`Nouvelle liste : ${parts.length} mot(s).`);
+      $("#scanReview").value = "";
+      updateCount();
+    });
     $("#scanAdd").addEventListener("click", () => {
-      const parts = $("#scanReview").value.split("\n").map((s) => s.trim()).filter(Boolean);
+      const parts = fieldWords();
       if (!parts.length) { say("Rien à ajouter"); return; }
       const cur = store.words();
+      const newOnes = parts.filter((p) => !cur.some((x) => x.toLowerCase() === p.toLowerCase())).length;
+      // Adding a new week's scan to last week's list doubles it: say so first.
+      if (cur.length && newOnes && !window.confirm(
+        `La liste contient déjà ${cur.length} mots. En ajouter ${newOnes} donne ${cur.length + newOnes} mots.\n\nSi ce sont les mots d'une nouvelle semaine, appuie sur Annuler et utilise « Nouvelle semaine ».`)) return;
       let added = 0;
       for (const p of parts) {
         if (!cur.some((x) => x.toLowerCase() === p.toLowerCase())) { cur.push(p); added++; }

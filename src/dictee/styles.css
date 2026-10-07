@@ -159,7 +159,7 @@ select {
 .menu button { width: 100%; margin-top: 12px; }
 .menu .m-blue { background: var(--tri-blue); color: var(--tri-blue-on); }
 .menu .m-red { background: var(--tri-red); color: var(--tri-red-on); }
-.menu .m-gold { background: var(--tri-gold); color: var(--tri-gold-on); }
+.menu .m-gold, .m-gold { background: var(--tri-gold); color: var(--tri-gold-on); }
 .m-review { width: 100%; background: #e8f5e9; color: #1b5e20; border: 1px solid #a5d6a7; }
 #reviewChooser { margin-top: 10px; padding: 12px; background: var(--card); border: 1px solid var(--card-line); border-radius: var(--radius); }
 #reviewChooser .label { margin-top: 0; }
