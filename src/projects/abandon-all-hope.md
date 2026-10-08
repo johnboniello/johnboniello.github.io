@@ -10,7 +10,7 @@ description: A comedy point-and-click adventure through Dante's Inferno
 
 This is a comedy point-and-click adventure game through the nine circles of Dante's *Inferno*, in the style of the old LucasArts and Sierra games. I built it with Claude Code, inspired by the idea behind Niven and Pournelle's novel *Inferno*. The story follows Dante's public-domain poem, but all the characters and jokes are new.
 
-Dez Pike, a growth-hacking "VP of Engagement" who choked on a kombucha mushroom in the middle of a keynote, is sure Hell is a prank and that there's always an exit. His guide, Mortimer Bleak, a 1920s insurance claims adjuster on intake duty, is sure there isn't. Each circle has its own puzzles, and the punishments are a little too familiar.
+Dez Pike, a growth-hacking "VP of Engagement" who choked on a kombucha skoby in the middle of a keynote, is sure Hell is a prank and that there's always an exit. His guide, Mortimer Bleak, a 1920s insurance claims adjuster on intake duty, is sure there isn't. Each circle has its own puzzles, and the punishments are a little too familiar. This is a first draft proof of concept and will be updated as it is developed more. 
 
 ## How to play
 
