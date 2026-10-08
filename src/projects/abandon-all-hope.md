@@ -14,12 +14,9 @@ Dez Pike, a growth-hacking "VP of Engagement" who choked on a kombucha mushroom 
 
 ## How to play
 
-- [Play it in your browser here](/abandon-all-hope-play/)
+- [Play it in your browser here](/abandon-all-hope-play/family/)
 
-There are two editions:
-
-1. **Family Edition** - for kids and everyone else. My 9-year-old daughter is the target audience here.
-2. **Grown-up Edition** - the same game with ruder jokes. ***Not*** for kids.
+It's made to be family friendly. My 9-year-old daughter is the target audience.
 
 It works on phones, tablets and computers. On a phone, turn it sideways. On an iPhone or iPad you can tap Share → "Add to Home Screen" so it opens full screen like an app. The first load downloads about 10 MB, so use Wi-Fi. Your progress is saved in the browser on that device.
 
@@ -34,6 +31,6 @@ The game saves automatically, and once you reach a circle you can jump back to i
 
 I hope you enjoy your trip through Hell!
 
-- [Play Abandon All Hope](/abandon-all-hope-play/)
+- [Play Abandon All Hope](/abandon-all-hope-play/family/)
 
 </section>

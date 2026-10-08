@@ -69,7 +69,7 @@ module.exports = {
     {
       title: "Abandon All Hope",
       description:
-        "A comedy point-and-click adventure through Dante's nine circles of Hell, with a Family and a Grown-up edition.",
+        "A comedy point-and-click adventure through Dante's nine circles of Hell, for the whole family.",
       url: "/projects/abandon-all-hope/",
       cta: "Explore",
       image: "/images/projects/abandon-all-hope.png",
