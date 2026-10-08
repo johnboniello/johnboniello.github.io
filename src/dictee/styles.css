@@ -295,3 +295,9 @@ input[type="file"] { display: none; }
   transition: transform .28s cubic-bezier(.2,1.6,.4,1), opacity .2s ease;
 }
 #celebrate-mascot.show { transform: translateX(-50%) scale(1); opacity: 1; }
+
+/* parent PIN pop-up */
+#pinDialog { border: none; border-radius: var(--radius); padding: 18px; width: min(340px, calc(100vw - 32px)); background: var(--card, #fff); }
+#pinDialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+#pinDialog h3 { margin: 0 0 10px; font-size: 16px; }
+#pinDialog input { width: 100%; box-sizing: border-box; font-size: 22px; letter-spacing: 6px; text-align: center; }

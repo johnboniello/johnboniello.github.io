@@ -39,6 +39,28 @@
     },
     wordsUpdatedAt() { const r = parseInt(localStorage.getItem("en_words_at"), 10); return isFinite(r) ? r : 0; },
     wordsReplacedAt() { const r = parseInt(localStorage.getItem("en_words_replaced_at"), 10); return isFinite(r) ? r : 0; },
+    // Game limits: rounds allowed per week's list (0 = unlimited). Plays are only
+    // counted while a game is limited, and each count belongs to one week's list
+    // (wordsReplacedAt), so a "New week" starts it over.
+    parentPinHash() { return localStorage.getItem("en_parent_pin") || null; },
+    setParentPinHash(v) { try { if (v) localStorage.setItem("en_parent_pin", v); else localStorage.removeItem("en_parent_pin"); } catch {} },
+    playLimit(game) { const n = parseInt(localStorage.getItem("en_limit_" + game), 10); return isFinite(n) ? n : 0; },
+    setPlayLimit(game, n) { try { localStorage.setItem("en_limit_" + game, String(n)); } catch {} },
+    _playsUsed(game) {
+      const week = parseInt(localStorage.getItem("en_plays_week_" + game), 10);
+      const used = parseInt(localStorage.getItem("en_plays_used_" + game), 10);
+      return week === this.wordsReplacedAt() && isFinite(used) ? used : 0;
+    },
+    /** Rounds left this week, or null when the game is unlimited. */
+    playsLeft(game) { const lim = this.playLimit(game); return lim === 0 ? null : Math.max(0, lim - this._playsUsed(game)); },
+    usePlay(game) {
+      if (this.playLimit(game) === 0) return;
+      try {
+        const used = this._playsUsed(game);
+        localStorage.setItem("en_plays_week_" + game, String(this.wordsReplacedAt()));
+        localStorage.setItem("en_plays_used_" + game, String(used + 1));
+      } catch {}
+    },
     // A word removed one at a time (not via "New week") is remembered
     // here so a sync can't resurrect it from another device's older copy of
     // the list — a plain word union has no way to represent a removal.
@@ -583,8 +605,9 @@
     show("home");
   });
   const game = (v) => ({ scramble, choice, dictee, words, scan }[v]);
-  $$("[data-go]").forEach((b) => b.addEventListener("click", () => {
+  $$("[data-go]").forEach((b) => b.addEventListener("click", async () => {
     const v = b.dataset.go;
+    if ((v === "words" || v === "scan") && !(await unlockParent())) return;
     reviewMode = false;
     game(v).start();
     show(v);
@@ -608,6 +631,12 @@
     const n = store.words().length;
     $("#wordCount").textContent = n === 1 ? "1 word in the list" : n + " words in the list";
     $("#rate").value = String(store.rate());
+    for (const game of Object.keys(GAMES)) {
+      $$(`[data-go="${game}"], [data-review="${game}"]`).forEach((b) => {
+        b.textContent = gameLabel(game);
+        b.style.opacity = store.playsLeft(game) === 0 ? "0.5" : "";
+      });
+    }
     const due = stats.dueCount();
     const rb = $("#reviewBtn");
     rb.hidden = due === 0;
@@ -617,13 +646,106 @@
   }
   $("#rate").addEventListener("change", (e) => { store.setRate(parseFloat(e.target.value)); say("This is the voice speed"); });
 
-  function endPrompt(score, aided, total, restart) {
-    const again = window.confirm(`All done!\nWithout help: ${score} / ${total}\nWith help: ${aided}\n\nPlay again?`);
+  /* ---------------- parent PIN ---------------- */
+  // Optional, not the device's PIN. When set, the parent screens (word list,
+  // scan) ask for it, so a child can't change the game limits or reset them
+  // with a new week. Stored as a hash.
+  async function pinHash(pin) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("spelling-pin:" + pin));
+    return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  /** Shows the PIN pop-up; resolves to the digits typed, or null if cancelled. */
+  function askPin(title, forgot = false) {
+    const dlg = $("#pinDialog");
+    $("#pinTitle").textContent = title;
+    $("#pinInput").value = "";
+    $("#pinForgot").hidden = !forgot;
+    return new Promise((resolve) => {
+      dlg.onclose = () => resolve(dlg.returnValue === "ok" ? $("#pinInput").value.trim() : null);
+      dlg.returnValue = "";
+      dlg.showModal();
+      $("#pinInput").focus();
+    });
+  }
+  $("#pinForgot").addEventListener("click", () => window.alert("To remove the PIN, clear this site's data in the browser settings. The word list comes back at the next sync if you use a family code; otherwise you'll need to scan it again."));
+  /** Resolves true when there's no PIN or the right one was entered. */
+  async function unlockParent() {
+    const want = store.parentPinHash();
+    if (!want) return true;
+    for (;;) {
+      const pin = await askPin("Parent PIN", true);
+      if (pin == null) return false;
+      if ((await pinHash(pin)) === want) return true;
+      window.alert("Wrong PIN.");
+    }
+  }
+  async function setNewPin() {
+    for (;;) {
+      const first = await askPin("New parent PIN (4 to 8 digits)");
+      if (first == null) return;
+      if (!/^\d{4,8}$/.test(first)) { window.alert("The PIN must be 4 to 8 digits."); continue; }
+      const second = await askPin("Enter the PIN again");
+      if (second == null) return;
+      if (second !== first) { window.alert("The two PINs don't match."); continue; }
+      store.setParentPinHash(await pinHash(first));
+      window.alert("Parent PIN set. It will be asked for Manage Words and Scan a List.");
+      return;
+    }
+  }
+  function renderPin() {
+    const on = !!store.parentPinHash();
+    $("#pinStatus").textContent = on ? "on" : "none";
+    $("#pinSet").textContent = on ? "Change" : "Set";
+    $("#pinRemove").hidden = !on;
+  }
+  $("#pinSet").addEventListener("click", async () => { await setNewPin(); renderPin(); });
+  $("#pinRemove").addEventListener("click", () => {
+    if (window.confirm("Remove the parent PIN?")) { store.setParentPinHash(null); renderPin(); }
+  });
+
+  /* ---------------- game limits ---------------- */
+  function renderLimits() {
+    $$("[data-limit]").forEach((sel) => {
+      if (!sel.options.length) {
+        for (const n of LIMIT_OPTIONS) sel.add(new Option(describeLimit(n), String(n)));
+        sel.addEventListener("change", () => store.setPlayLimit(sel.dataset.limit, parseInt(sel.value, 10)));
+      }
+      sel.value = String(store.playLimit(sel.dataset.limit));
+    });
+  }
+  const GAMES = { scramble: ["🔤", "Scrambled Letters"], choice: ["🎯", "Pick the Spelling"], dictee: ["✏️", "Write the Word"] };
+  const LIMIT_OPTIONS = [0, 1, 2, 3, 4, 5, 10];
+  function gameLabel(game) {
+    const left = store.playsLeft(game);
+    const suffix = left == null ? "" : left === 0 ? " (done for this week)" : left === 1 ? " (1 game left)" : ` (${left} games left)`;
+    return `${GAMES[game][0]}\u00a0 ${GAMES[game][1]}${suffix}`;
+  }
+  const blockedText = (game) => `You've played ${GAMES[game][1]} ${store.playLimit(game) === 1 ? "once" : store.playLimit(game) + " times"} this week. 💪 Try another game!`;
+  const describeLimit = (n) => (n === 0 ? "Unlimited" : n === 1 ? "1 game per week" : `${n} games per week`);
+  /** One game's round: it uses up a play on its first answer, so opening a game
+   *  and backing out costs nothing. */
+  function playCharge(game) {
+    let week = -1;
+    const charged = () => week === store.wordsReplacedAt();
+    return {
+      blocked: () => !charged() && store.playsLeft(game) === 0,
+      charge() { if (!charged()) { store.usePlay(game); week = store.wordsReplacedAt(); } },
+      reset() { week = -1; },
+    };
+  }
+
+  function endPrompt(score, aided, total, restart, game) {
+    const res = `All done!\nWithout help: ${score} / ${total}\nWith help: ${aided}`;
+    const left = store.playsLeft(game);
+    if (left === 0) { window.alert(res + "\n\n" + `No more ${GAMES[game][1]} games this week.`); show("home"); return; }
+    const more = left == null ? "" : left === 1 ? "\n\n1 game left" : `\n\n${left} games left`;
+    const again = window.confirm(res + more + "\n\nPlay again?");
     if (again) restart(); else show("home");
   }
 
   /* ================= SCRAMBLE ================= */
   const scramble = (() => {
+    const ch = playCharge("scramble");
     let list = [], order = [], pos = 0, score = 0, aided = 0, solved = false, hinted = false, wrongThisWord = false;
     let slotChars = [];
     const wordStart = new Set();
@@ -640,8 +762,10 @@
 
     function start() {
       list = sourceWords();
-      const empty = list.length === 0;
-      $("#scrEmpty").textContent = emptyMsg();
+      ch.reset();
+      const blocked = list.length > 0 && ch.blocked();
+      const empty = list.length === 0 || blocked;
+      $("#scrEmpty").textContent = blocked ? blockedText("scramble") : emptyMsg();
       $("#scrEmpty").hidden = !empty;
       $("#board").hidden = empty;
       $("#scrControls").hidden = empty;
@@ -782,6 +906,7 @@
       // since, the word isn't finished: judging it now would say "Not quite"
       // and record a miss she never made.
       if (solved || !allFilled()) return;
+      ch.charge();
       const slots = slotEls();
       const right = slotChars.every((c, i) => {
         const t = tileIn(slots[i]);
@@ -837,7 +962,7 @@
 
     function next() {
       if (pos + 1 >= order.length) {
-        endPrompt(score, aided, order.length, () => { shuffle(order); pos = 0; score = 0; aided = 0; round(); });
+        endPrompt(score, aided, order.length, () => { ch.reset(); shuffle(order); pos = 0; score = 0; aided = 0; round(); }, "scramble");
         return;
       }
       pos++;
@@ -855,6 +980,7 @@
 
   /* ================= CHOICE ================= */
   const choice = (() => {
+    const ch = playCharge("choice");
     let list = [], order = [], pos = 0, score = 0, aided = 0, correctIdx = -1, solved = false, wrong = false;
     const opts = $$("#choice .opt");
     const curWord = () => list[order[pos]];
@@ -864,8 +990,10 @@
 
     function start() {
       list = sourceWords();
-      const empty = list.length === 0;
-      $("#choiceEmpty").textContent = emptyMsg();
+      ch.reset();
+      const blocked = list.length > 0 && ch.blocked();
+      const empty = list.length === 0 || blocked;
+      $("#choiceEmpty").textContent = blocked ? blockedText("choice") : emptyMsg();
       $("#choiceEmpty").hidden = !empty;
       $("#choiceListenRow").hidden = empty;
       $("#choiceInstruction").hidden = empty;
@@ -902,6 +1030,7 @@
 
     function pick(i) {
       if (solved || opts[i].disabled) return;
+      ch.charge();
       if (i === correctIdx) {
         solved = true;
         opts[i].classList.add("good");
@@ -925,7 +1054,7 @@
 
     function next() {
       if (pos + 1 >= order.length) {
-        endPrompt(score, aided, order.length, () => { shuffle(order); pos = 0; score = 0; aided = 0; round(); });
+        endPrompt(score, aided, order.length, () => { ch.reset(); shuffle(order); pos = 0; score = 0; aided = 0; round(); }, "choice");
         return;
       }
       pos++;
@@ -942,6 +1071,7 @@
 
   /* ================= WRITE THE WORD ================= */
   const dictee = (() => {
+    const ch = playCharge("dictee");
     const KEYS = [..."abcdefghijklmnopqrstuvwxyz".split(""), "'", "-", " "];
     let list = [], order = [], pos = 0, score = 0, aidedCount = 0;
     let guess = "", scored = false, aided = false, revealCount = 0, attempts = 0, revealed = false, recorded = false;
@@ -972,8 +1102,10 @@
     function start() {
       buildKeyboard();
       list = sourceWords();
-      const empty = list.length === 0;
-      $("#dictEmpty").textContent = emptyMsg();
+      ch.reset();
+      const blocked = list.length > 0 && ch.blocked();
+      const empty = list.length === 0 || blocked;
+      $("#dictEmpty").textContent = blocked ? blockedText("dictee") : emptyMsg();
       $("#dictEmpty").hidden = !empty;
       $("#dictBody").hidden = empty;
       $("#dictProgress").textContent = "";
@@ -1015,6 +1147,7 @@
 
     function onCheck() {
       if (!guess.length) { say("Type your spelling first"); return; }
+      ch.charge();
       const res = checkSpelling(curWord(), guess);
       $("#dictYours").innerHTML = renderRow(res, false);
       const summary = $("#dictSummary");
@@ -1057,7 +1190,7 @@
     function next() {
       if (!recorded && attempts > 0) { stats.record(curWord(), true); recorded = true; }
       if (pos + 1 >= order.length) {
-        endPrompt(score, aidedCount, order.length, () => { shuffle(order); pos = 0; score = 0; aidedCount = 0; round(); });
+        endPrompt(score, aidedCount, order.length, () => { ch.reset(); shuffle(order); pos = 0; score = 0; aidedCount = 0; round(); }, "dictee");
         return;
       }
       pos++;
@@ -1082,7 +1215,7 @@
 
   /* ================= WORDS ================= */
   const words = (() => {
-    function start() { render(); renderReview(); $("#wordInput").value = ""; sync.refresh(); }
+    function start() { render(); renderReview(); renderLimits(); renderPin(); $("#wordInput").value = ""; sync.refresh(); }
 
     function makeRow(text, controls) {
       const row = document.createElement("div");

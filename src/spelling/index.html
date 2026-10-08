@@ -155,6 +155,16 @@
       <button class="ghost mt-sm" id="reviewClean">🧹 Remove mastered words</button>
     </div>
 
+    <div class="review-card" id="limitsCard">
+      <h3>🔒 Parental controls</h3>
+      <p class="muted">How many rounds of each game are allowed per week’s list (the count starts over with every “New week”), and a PIN to protect Manage Words and Scan a List.</p>
+      <div class="settings-row"><label for="limit-scramble" class="muted">🔤&nbsp; Scrambled Letters</label><select id="limit-scramble" data-limit="scramble"></select></div>
+      <div class="settings-row"><label for="limit-choice" class="muted">🎯&nbsp; Pick the Spelling</label><select id="limit-choice" data-limit="choice"></select></div>
+      <div class="settings-row"><label for="limit-dictee" class="muted">✏️&nbsp; Write the Word</label><select id="limit-dictee" data-limit="dictee"></select></div>
+      <div class="settings-row"><span class="muted">🔑&nbsp; Parent PIN : <b id="pinStatus"></b></span>
+        <span><button class="ghost" id="pinSet"></button> <button class="ghost" id="pinRemove" hidden>Remove</button></span></div>
+    </div>
+
     <div class="sync-card" id="syncCard" hidden>
       <h3>🔗 Share the list between devices</h3>
       <p class="muted">Make a code, then enter the same code on the other device and tap Sync.</p>
@@ -185,6 +195,17 @@
   </section>
 
 </div>
+<dialog id="pinDialog">
+  <form method="dialog">
+    <h3 id="pinTitle"></h3>
+    <input type="password" id="pinInput" inputmode="numeric" maxlength="8" autocomplete="off">
+    <div class="btn-row mt-sm">
+      <button class="ghost" value="cancel" formnovalidate>Cancel</button>
+      <button value="ok">OK</button>
+    </div>
+    <button type="button" class="ghost mt-sm wide" id="pinForgot">Forgot PIN?</button>
+  </form>
+</dialog>
 <script src="./app.js"></script>
 </body>
 </html>

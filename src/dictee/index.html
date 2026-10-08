@@ -155,6 +155,16 @@
       <button class="ghost mt-sm" id="reviewClean">🧹 Retirer les mots maîtrisés</button>
     </div>
 
+    <div class="review-card" id="limitsCard">
+      <h3>🔒 Contrôle parental</h3>
+      <p class="muted">Combien de parties de chaque jeu sont permises par liste de la semaine (le compte repart à zéro à chaque « Nouvelle semaine »), et un code pour protéger « Gérer les mots » et « Scanner une liste ».</p>
+      <div class="settings-row"><label for="limit-scramble" class="muted">🔤&nbsp; Lettres mélangées</label><select id="limit-scramble" data-limit="scramble"></select></div>
+      <div class="settings-row"><label for="limit-choice" class="muted">🎯&nbsp; Le bon mot</label><select id="limit-choice" data-limit="choice"></select></div>
+      <div class="settings-row"><label for="limit-dictee" class="muted">✏️&nbsp; Écris le mot</label><select id="limit-dictee" data-limit="dictee"></select></div>
+      <div class="settings-row"><span class="muted">🔑&nbsp; Code parent : <b id="pinStatus"></b></span>
+        <span><button class="ghost" id="pinSet"></button> <button class="ghost" id="pinRemove" hidden>Retirer</button></span></div>
+    </div>
+
     <div class="sync-card" id="syncCard" hidden>
       <h3>🔗 Partager la liste entre appareils</h3>
       <p class="muted">Crée un code, puis saisis le même code sur l'autre appareil et appuie sur Synchroniser.</p>
@@ -185,6 +195,17 @@
   </section>
 
 </div>
+<dialog id="pinDialog">
+  <form method="dialog">
+    <h3 id="pinTitle"></h3>
+    <input type="password" id="pinInput" inputmode="numeric" maxlength="8" autocomplete="off">
+    <div class="btn-row mt-sm">
+      <button class="ghost" value="cancel" formnovalidate>Annuler</button>
+      <button value="ok">OK</button>
+    </div>
+    <button type="button" class="ghost mt-sm wide" id="pinForgot">Code oublié ?</button>
+  </form>
+</dialog>
 <script src="./app.js"></script>
 </body>
 </html>
