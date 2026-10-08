@@ -40,6 +40,11 @@ module.exports = function (eleventyConfig) {
     return DateTime.fromJSDate(dateObj, { zone: "utc" }).toISODate();
   });
 
+  // True for files inside the passthrough app folders (dictee, spelling, ...)
+  eleventyConfig.addFilter("appFolder", (inputPath) =>
+    /^\.\/src\/(dictee|spelling|conjugaison|grocery)\//.test(inputPath)
+  );
+
   eleventyConfig.addFilter("limit", (arr, n) => arr.slice(0, n));
 
   eleventyConfig.addGlobalData("currentYear", () => new Date().getFullYear());

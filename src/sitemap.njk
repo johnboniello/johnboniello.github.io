@@ -1,0 +1,18 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="utf-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{%- for item in collections.all %}
+{#- Skip the app folders: Eleventy also renders their HTML as stray duplicates. #}
+{%- if not (item.inputPath | appFolder) %}
+  <url><loc>{{ site.url }}{{ item.url | replace(" ", "%20") }}</loc></url>
+{%- endif %}
+{%- endfor %}
+{#- The app folders are passthrough copies, so list their install pages by hand.
+    The games themselves are left out. #}
+{%- for app in ["dictee", "spelling", "conjugaison"] %}
+  <url><loc>{{ site.url }}/{{ app }}/install.html</loc></url>
+{%- endfor %}
+</urlset>
